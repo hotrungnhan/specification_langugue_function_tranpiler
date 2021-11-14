@@ -1,0 +1,21 @@
+{
+	"name": "dacta_langugae",
+	"version": "1.0.0",
+	"main": "index.ts",
+	"license": "MIT",
+	"scripts": {
+		"build": "tsc",
+		"dev": "ts-node -r tsconfig-paths/register --files src/index.ts -c",
+		"test": "mocha -r tsconfig-paths/register -r ts-node/register src/tests/**/*.ts"
+	},
+	"devDependencies": {
+		"@types/chai": "^4.2.22",
+		"@types/mocha": "^9.0.0",
+		"@types/node": "^16.11.0",
+		"chai": "^4.3.4",
+		"mocha": "^9.1.2",
+		"ts-node": "^10.3.0",
+		"tsconfig-paths": "^3.11.0",
+		"typescript": "^4.4.4"
+	}
+}
