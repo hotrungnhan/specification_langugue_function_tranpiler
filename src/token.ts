@@ -1,40 +1,4 @@
-export class Token {
-	private type: TokenT;
-	constructor(type: TokenT) {
-		this.type = type;
-	}
-	is(type: TokenT): boolean {
-		return this.type == type;
-	}
-	get Type() {
-		return this.type;
-	}
-}
-export abstract class ValueToken extends Token {
-	private value: any;
-	constructor(value: any, type: TokenT) {
-		super(type);
-		this.value = value;
-	}
-	get Value() {
-		return this.value;
-	}
-}
-export class LiTToken extends ValueToken {
-	private kind: LitKind;
-	constructor(value: any, kind: LitKind) {
-		super(value, Basic.LITERAL);
-		this.kind = kind;
-	}
-	get Kind(): LitKind {
-		return this.kind;
-	}
-}
-export class NameToken extends ValueToken {
-	constructor(value: any) {
-		super(value, Basic.NAME);
-	}
-}
+import { Expr } from "@/expr";
 
 export enum LitKind {
 	IntLit,
@@ -103,4 +67,42 @@ export enum Operator {
 	NOT = "!", // !
 	AND = "&&", // &&
 	OR = "||" // ||
+}
+
+export class Token {
+	private type: TokenT;
+	constructor(type: TokenT) {
+		this.type = type;
+	}
+	is(type: TokenT): boolean {
+		return this.type == type;
+	}
+	get Type() {
+		return this.type;
+	}
+}
+export abstract class ValueToken extends Token {
+	private value: any;
+	constructor(value: any, type: TokenT) {
+		super(type);
+		this.value = value;
+	}
+	get Value() {
+		return this.value;
+	}
+}
+export class LiTToken extends ValueToken {
+	private kind: LitKind;
+	constructor(value: any, kind: LitKind) {
+		super(value, Basic.LITERAL);
+		this.kind = kind;
+	}
+	get Kind(): LitKind {
+		return this.kind;
+	}
+}
+export class NameToken extends ValueToken {
+	constructor(value: any) {
+		super(value, Basic.NAME);
+	}
 }

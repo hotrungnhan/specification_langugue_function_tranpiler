@@ -118,10 +118,16 @@ export class ForLoopExpr extends KeywordExpr {
 	private loopvariable: DeclareVariableExpr;
 	private body: Expr;
 	private assign: Expr;
-	constructor(token: Expr, loopvariable: Expr, body: Expr, assign ) {
+	constructor(
+		token: Token,
+		loopvariable: DeclareVariableExpr,
+		body: Expr,
+		assign: Expr
+	) {
 		super();
-		this.mainbody = body;
-		this.loopvariable = elsebody;
-		this.mainbody = body;
+		this.token = token;
+		this.loopvariable = loopvariable;
+		this.body = body;
+		this.assign = assign;
 	}
 }

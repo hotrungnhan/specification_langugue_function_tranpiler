@@ -1,3 +1,6 @@
+export class FunctionContext {
+	level: Blocklevel = new Blocklevel();
+}
 class Blocklevel {
 	level = 0;
 	incre() {
@@ -11,7 +14,4 @@ class Blocklevel {
 	getSpaceByLevel() {
 		return " ".repeat(4 * this.level);
 	}
-}
-export class FunctionContext {
-	level: Blocklevel = new Blocklevel();
 }
