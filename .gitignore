@@ -4,3 +4,4 @@ mochawesome-report/*
 dist
 dist-ssr
 *.local
+yarn-error.log
