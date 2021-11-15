@@ -1,9 +1,9 @@
 import { DataType } from "@/token";
 import { FunctionVisitor } from "@/visitor";
 import { ExprAST } from "@/expr";
-export class DataTypeIdentifier {
-	name!: string;
-	type!: DataType;
+export class VariableIdentifier {
+	name: string;
+	type: DataType;
 	constructor(name: string, type: DataType) {
 		this.name = name;
 		this.type = type;
@@ -11,18 +11,20 @@ export class DataTypeIdentifier {
 }
 export class FunctionDecl {
 	functionName: string;
-	Parameter: Array<DataTypeIdentifier> = [];
-	Return: Array<DataTypeIdentifier> = [];
+	Parameter: Array<VariableIdentifier> = [];
+	Return: VariableIdentifier;
 	Pre: ExprAST;
 	Post: ExprAST;
 	constructor(
 		functionName: string,
-		Parameter: Array<DataTypeIdentifier>,
+		Parameter: Array<VariableIdentifier>,
+		Return: VariableIdentifier,
 		Pre: ExprAST,
 		Post: ExprAST
 	) {
 		this.functionName = functionName;
 		this.Parameter = Parameter;
+		this.Return = Return;
 		this.Pre = Pre;
 		this.Post = Post;
 	}

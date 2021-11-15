@@ -1,11 +1,24 @@
 import { expect, should } from "chai";
 import { JavascriptFunctionVisitor } from "@/visitor";
-import { FunctionDecl } from "@/function";
+import { FunctionDecl, VariableIdentifier } from "@/function";
 import { ExprAST, BinaryExpr, Expr } from "@/expr";
 import util from "util";
-import { Token, Operator, LiTToken, LitKind, NameToken } from "@/token";
+import {
+	Token,
+	Operator,
+	LiTToken,
+	LitKind,
+	NameToken,
+	DataType
+} from "@/token";
 
-let f = new FunctionDecl("HelloWorld", [], new ExprAST(), new ExprAST());
+let f = new FunctionDecl(
+	"HelloWorld",
+	[],
+	new VariableIdentifier("kq", DataType.B),
+	new ExprAST(),
+	new ExprAST()
+);
 let js = new JavascriptFunctionVisitor();
 let ast = new ExprAST(
 	new BinaryExpr(

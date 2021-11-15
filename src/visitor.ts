@@ -1,31 +1,67 @@
-import { DataType, Operator, Keyword } from "@/token";
+import { Operator, LitKind, LiTToken, ValueToken } from "@/token";
 import { FunctionDecl } from "@/function";
-import { ExprAST, BinaryExpr, UnaryExpr, Expr } from "@/expr";
+import {
+	ExprAST,
+	BinaryExpr,
+	UnaryExpr,
+	Expr,
+	DeclareVariableExpr
+} from "@/expr";
+import { FunctionContext } from "@/context";
 export interface FunctionVisitor {
 	visitFunction(f: FunctionDecl): string;
 	visitExprAST(AST: ExprAST): string;
 	visitExpr(expr: Expr): string;
 	visitUnary(expr: BinaryExpr): string;
 	visitBinary(expr: BinaryExpr): string;
+	visitDeclareVariable(expr: DeclareVariableExpr): string;
 	// visitForLoop(AST: ForloopExpr): string;
 }
-export class JavascriptFunctionVisitor implements FunctionVisitor {
+export class JavascriptFunctionVisitor
+	extends FunctionContext
+	implements FunctionVisitor
+{
+	genCommand(str: string) {
+		return `${this.level.getSpaceByLevel()}${str};\n`;
+	}
 	visitFunction(f: FunctionDecl): string {
-		let ctx = `function ${f.functionName}`;
-		ctx += "(";
+		let output = `function ${f.functionName}`;
+		output += "(";
+		//setup parameter
 		f.Parameter.forEach((param, index, arr) => {
 			if (index == arr.length - 1) {
 				// last parameter
-				ctx += param.name;
+				output += param.name;
 			} else {
-				ctx += param.name + ",";
+				output += param.name + ",";
 			}
 		});
-		ctx += "){\n";
-		ctx += this.visitExprAST(f.Pre);
-		ctx += this.visitExprAST(f.Post);
-		ctx += "}";
-		return ctx;
+		output += "){\n";
+		// declare output variable
+		this.level.incre()
+		output += this.visitDeclareVariable(new DeclareVariableExpr(f.Return));
+		output += this.visitExprAST(f.Pre);
+		output += this.visitExprAST(f.Post);
+		output += "}";
+		return output;
+	}
+	visitDeclareVariable(expr: DeclareVariableExpr): string {
+		if (expr.valueToken) {
+			return this.genCommand(
+				`let ${expr.Name} = ${this.visitLiterature(expr.valueToken)}`
+			);
+		} else {
+			return this.genCommand(`let ${expr.Name}`);
+		}
+	}
+	visitLiterature(tok: LiTToken): string {
+		switch (tok.Kind) {
+			case LitKind.FloatLit:
+			case LitKind.IntLit:
+				return tok.Value;
+			case LitKind.StringLit:
+				return `"${tok.Value}"`;
+		}
 	}
 	visitExprAST(ast: ExprAST): string {
 		return ast.visitNode(this);
@@ -37,19 +73,22 @@ export class JavascriptFunctionVisitor implements FunctionVisitor {
 		if (e instanceof BinaryExpr) {
 			return this.visitBinary(e);
 		}
+		if (e instanceof DeclareVariableExpr) {
+			return this.visitDeclareVariable(e);
+		}
 		return "";
 	}
 	visitUnary(expr: UnaryExpr): string {
-		switch (expr.token.type) {
+		switch (expr.type) {
 			case Operator.NOT:
 				return `!${expr.visitRight(this)}`;
 		}
 		return "";
 	}
 	visitBinary(expr: BinaryExpr): string {
-		switch (expr.token.type) {
-			case Operator.ASSIGN:
-				return `(${expr.visitLeft(this)} = ${expr.visitRight(this)})`;
+		switch (expr.type) {
+			// case Operator.ASSIGN:
+			// return `(${expr.visitLeft(this)} = ${expr.visitRight(this)})`;
 			case Operator.PLUS:
 				return `(${expr.visitLeft(this)} + ${expr.visitRight(this)})`;
 			case Operator.MINUS:

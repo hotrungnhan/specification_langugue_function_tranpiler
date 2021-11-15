@@ -1,5 +1,7 @@
-import { LiTToken, LoopType, NameToken, Token, ValueToken } from "@/token";
+import { LiTToken, NameToken, Token, TokenT, ValueToken } from "@/token";
 import { FunctionVisitor } from "@/visitor";
+import { VariableIdentifier } from "./function";
+type Operand = ValueToken | Expr;
 export class ExprAST {
 	topNode?: Expr;
 	constructor(node?: Expr) {
@@ -14,70 +16,112 @@ export class ExprAST {
 	}
 	static Parser(list: Array<Token>) {}
 }
-type Operand = ValueToken | Expr | LiTToken | NameToken;
-export abstract class Expr {
-	token?: Token;
-	right?: Operand;
-	left?: Operand;
-}
-export class UnaryExpr extends Expr {
-	token: Token;
-	right: Operand;
-	constructor(token: Token, right: Operand) {
+
+export abstract class Expr {}
+export abstract class MathExp extends Expr {
+	private token: Token;
+	constructor(token: Token) {
 		super();
 		this.token = token;
+	}
+	get type(): TokenT {
+		return this.token.Type;
+	}
+}
+export abstract class KeywordExpr {}
+export class UnaryExpr extends MathExp {
+	right: Operand;
+	constructor(token: Token, right: Operand) {
+		super(token);
 		this.right = right;
 	}
 	visitRight(visitor: FunctionVisitor) {
 		if (this.right instanceof Expr) {
 			return visitor.visitExpr(this.right);
 		} else if (this.right instanceof ValueToken) {
-			return this.right.value;
+			return this.right.Value;
 		}
 		return "";
 	}
 }
-export class BinaryExpr extends Expr {
-	token: Token;
+export class BinaryExpr extends MathExp {
 	left: Operand;
 	right: Operand;
 	constructor(token: Token, left: Operand, right: Operand) {
-		super();
-		this.token = token;
+		super(token);
 		this.left = left;
 		this.right = right;
 	}
 	visitLeft(visitor: FunctionVisitor) {
-		console.log(this.left instanceof Expr);
-		if (this.left instanceof Expr) {
+		if (this.left instanceof MathExp) {
 			return visitor.visitExpr(this.left);
 		} else if (this.left instanceof ValueToken) {
-			return this.left.value;
+			return this.left.Value;
 		}
 		return "";
 	}
 	visitRight(visitor: FunctionVisitor) {
-		if (this.right instanceof Expr) {
+		if (this.right instanceof MathExp) {
 			return visitor.visitExpr(this.right);
 		} else if (this.right instanceof ValueToken) {
-			return this.right.value;
+			return this.right.Value;
 		}
 		return "";
 	}
 }
-// export class ForloopExpr implements Expr {
-// 	condition: Operand;
-// 	loopkey: NameToken;
-// 	body: Operand;
-// 	LoopType: LoopType;
-// 	constructor(
-// 		LoopType: LoopType,
-// 		condition: Expr,
-// 		Loopkey: NameToken,
-// 		body: Expr
-// 	) {
-// 		this.LoopType = LoopType;
-// 		this.condition = condition;
-// 		this.body = body;
-// 		this.loopkey = Loopkey;
-// 	}
+export class ForloopExpr extends Expr {
+	condition: Operand;
+	loopkey: NameToken;
+	body: Operand;
+	token: Token;
+	constructor(token: Token, condition: Expr, Loopkey: NameToken, body: Expr) {
+		super();
+		this.token = token;
+		this.condition = condition;
+		this.body = body;
+		this.loopkey = Loopkey;
+	}
+}
+
+export class DeclareVariableExpr extends KeywordExpr {
+	private variable: VariableIdentifier;
+	private token?: LiTToken;
+	constructor(variable: VariableIdentifier, token?: LiTToken) {
+		super();
+		this.variable = variable;
+		this.token = token || undefined;
+	}
+	get DataType() {
+		return this.variable.type;
+	}
+	get Name() {
+		return this.variable.name;
+	}
+	get valueToken() {
+		return this.token;
+	}
+}
+export class IfElseExpr extends KeywordExpr {
+	private condition: Expr;
+	private mainbody: Expr;
+	private elsebody: Expr;
+
+	constructor(condition: Expr, body: Expr, elsebody: Expr) {
+		super();
+		this.mainbody = body;
+		this.elsebody = elsebody;
+		this.condition = condition;
+	}
+}
+export class ForLoopExpr extends KeywordExpr {
+	private token: Token; //tt vm ...
+	private loopvariable: DeclareVariableExpr;
+	private body: Expr;
+	private assign: Expr;
+	constructor(token: Expr, loopvariable: Expr, body: Expr, assign ) {
+		super();
+		this.mainbody = body;
+		this.loopvariable = elsebody;
+		this.mainbody = body;
+	}
+}
