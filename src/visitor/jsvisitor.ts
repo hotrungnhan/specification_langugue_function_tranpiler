@@ -1,5 +1,5 @@
 import { Operator, LitKind } from "@/token";
-import { LiTToken, ValueToken } from "token";
+import { LiTToken, ValueToken } from "@/token";
 import { FunctionDecl } from "@/function";
 import {
 	ExprAST,
@@ -55,6 +55,7 @@ export class JavascriptFunctionVisitor
 			case LitKind.StringLit:
 				return `"${tok.Value}"`;
 		}
+		return "";
 	}
 	visitExprAST(ast: ExprAST): string {
 		return ast.visitNode(this);

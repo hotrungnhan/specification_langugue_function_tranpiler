@@ -1,5 +1,5 @@
 import { expect, should } from "chai";
-import { JavascriptFunctionVisitor } from "@/visitor";
+import { JavascriptFunctionVisitor } from "@/visitor/jsvisitor";
 import { FunctionDecl, VariableIdentifier } from "@/function";
 import { ExprAST, BinaryExpr, UnaryExpr } from "@/expr";
 import util from "util";
