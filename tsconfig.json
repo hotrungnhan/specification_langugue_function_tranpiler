@@ -18,7 +18,7 @@
         "src/*"
       ],
       "@web/*": [
-        "src/web/*"
+        "web/*"
       ]
     },
     "esModuleInterop": false,
@@ -27,11 +27,17 @@
     "strict": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "isolatedModules": false,
-    "jsx": "react-jsx"
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "plugins": [
+      {
+        "name": "typescript-plugin-css-modules"
+      }
+    ]
   },
   "include": [
     "src/**/*",
-    "tests/**/*"
+    "tests/**/*",
+    "web/**/*",
   ],
 }

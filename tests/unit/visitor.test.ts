@@ -78,3 +78,4 @@ describe("visitor test", function () {
 		expect(kq == "(10 || 5) && 5");
 	});
 });
+export {}
