@@ -33,8 +33,8 @@ const auth: AuthBody = {
 function executeCode(
 	src: string,
 	language: Language,
-	versionIndex: number = 3,
-	stdin?: string
+	stdin?: string,
+	versionIndex: number = 3
 ) {
 	return axios.post<ExecuteRespone, AxiosResponse<ExecuteRespone>, ExecuteBody>(
 		"/execute",

@@ -51,10 +51,10 @@ function App() {
 		if (credit >= 200) {
 			return setErrorMessage("Out of credit");
 		}
-		Api.executeCode(src, lang)
+		Api.executeCode(src, lang, stdin)
 			.then((res) => {
 				setCredit(credit + 1);
-				setOutput(res.data.output);
+				setOutput(res.data.output.trim());
 			})
 			.catch((err) => {
 				setErrorMessage(err.message);

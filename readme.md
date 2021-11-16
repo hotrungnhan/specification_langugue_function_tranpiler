@@ -10,12 +10,18 @@ Top Down
 - ![20%](https://progress-bar.dev/20) # Scanner
 - ![100%](https://progress-bar.dev/100) # Token List
 - ![0%](https://progress-bar.dev/0) # Scanner Storage Abtract class ( not requried)
+
 # for Whole project
-- ![0%](https://progress-bar.dev/0) # website 
+
+- ![90%](https://progress-bar.dev/0) # website (currently, it lack of hightlighting code)
 - ![20%](https://progress-bar.dev/10) # Unit test (necessary)
-# Run code platform 
+
+# Run code platform
+
 - https://docs.jdoodle.com/compiler-api/compiler-api
-# Docs 
+
+# Docs
+
 - http://web.cse.ohio-state.edu/software/2231/web-sw2/extras/slides/21.Abstract-Syntax-Trees.pdf
 - https://github.com/DoctorWkt/acwj
 - https://daily.dev/blog/transpilers-how-they-work#transpilers-mechanism
