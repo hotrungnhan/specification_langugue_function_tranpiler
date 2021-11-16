@@ -38,7 +38,13 @@ function executeCode(
 ) {
 	return axios.post<ExecuteRespone, AxiosResponse<ExecuteRespone>, ExecuteBody>(
 		"/execute",
-		{ language: language, versionIndex: versionIndex, stdin: stdin, ...auth }
+		{
+			script: src,
+			language: language,
+			versionIndex: versionIndex,
+			stdin: stdin,
+			...auth
+		}
 	);
 }
 export enum Language {

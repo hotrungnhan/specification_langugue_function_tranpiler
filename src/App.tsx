@@ -29,10 +29,10 @@ function App() {
 	function closeModal() {
 		setErrorMessage("");
 	}
-	type TLanguage = "Javascript" | "Python";
+	type TLanguage = "javascript" | "python";
 	const languageMap = {
-		Javascript: Api.Language.js,
-		Python: Api.Language.py
+		javascript: Api.Language.js,
+		python: Api.Language.py
 	};
 	useEffect(() => {
 		Api.getCredit()
@@ -44,7 +44,7 @@ function App() {
 			});
 	}, []); // [] as 2nd parameter is componentDidmount
 	function executeCode() {
-		let lang = languageMap[language as TLanguage];
+		let lang = languageMap[language.toLocaleLowerCase() as TLanguage];
 		if (src.trim() == "") {
 			return setErrorMessage("Code in the left is empty");
 		}
@@ -106,8 +106,8 @@ function App() {
 						value={language}
 						onChange={(event) => setLanguage(event.target.value)}
 					>
-						<option value="javascript">Javascript</option>
-						<option value="python">Python</option>
+						<option value="Javascript">Javascript</option>
+						<option value="Python">Python</option>
 					</select>
 					<p className="text-white">Current Credit: {credit}</p>
 				</div>
