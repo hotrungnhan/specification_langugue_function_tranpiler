@@ -1,3 +1,4 @@
+export {};
 // import { Token, TokenT, LitKind, Operator, Basic, Delemiter } from "./token";
 // import { Source } from "./source";
 // export class Scanner extends Source {

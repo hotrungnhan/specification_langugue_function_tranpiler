@@ -1,7 +1,7 @@
 import { expect, should } from "chai";
-import { JavascriptFunctionVisitor } from "@/visitor/jsvisitor";
-import { FunctionDecl, VariableIdentifier } from "@/function";
-import { ExprAST, BinaryExpr, UnaryExpr } from "@/expr";
+import { JavascriptFunctionVisitor } from "@web/tranpiler/visitor/jsvisitor";
+import { FunctionDecl, VariableIdentifier } from "@web/tranpiler/function";
+import { ExprAST, BinaryExpr, UnaryExpr } from "@web/tranpiler/expr";
 import util from "util";
 import {
 	Token,
@@ -10,7 +10,7 @@ import {
 	DataType,
 	LitKind,
 	NameToken
-} from "@/token";
+} from "@web/tranpiler/token";
 let f = new FunctionDecl(
 	"HelloWorld",
 	[],

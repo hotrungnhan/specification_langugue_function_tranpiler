@@ -38,7 +38,7 @@ function executeCode(
 		{ language: language, versionIndex: versionIndex, stdin: stdin, ...auth }
 	);
 }
-enum Language {
+export enum Language {
 	py = "python3",
 	js = "nodejs"
 }

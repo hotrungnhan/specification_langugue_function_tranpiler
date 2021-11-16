@@ -1,15 +1,15 @@
-import { Operator, LitKind } from "@/token";
-import { LiTToken, ValueToken } from "@/token";
-import { FunctionDecl } from "@/function";
+import { Operator, LitKind } from "@web/tranpiler/token";
+import { LiTToken, ValueToken } from "@web/tranpiler/token";
+import { FunctionDecl } from "@web/tranpiler/function";
 import {
 	ExprAST,
 	BinaryExpr,
 	UnaryExpr,
 	Expr,
 	DeclareVariableExpr
-} from "@/expr";
-import { FunctionContext } from "@/context";
-import { FunctionVisitor } from "@/visitor";
+} from "@web/tranpiler/expr";
+import { FunctionContext } from "@web/tranpiler/context";
+import { FunctionVisitor } from "@web/tranpiler/visitor";
 export class JavascriptFunctionVisitor
 	extends FunctionContext
 	implements FunctionVisitor

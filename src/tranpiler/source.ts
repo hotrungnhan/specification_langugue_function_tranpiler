@@ -1,3 +1,4 @@
+export {}
 // import { Char } from "./char";
 // const linebase = 0;
 // const colbase = 0;
