@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import Modal from "react-modal";
 import { FaInfoCircle } from "react-icons/fa";
-
+Modal.setAppElement("#root");
 const modelType = {
 	content: {
 		top: "50%",
@@ -42,11 +42,11 @@ function App() {
 			.catch((err) => {
 				setErrorMessage(err.message);
 			});
-	});
+	}, []); // [] as 2nd parameter is componentDidmount
 	function executeCode() {
 		let lang = languageMap[language as TLanguage];
 		if (src.trim() == "") {
-			return setErrorMessage("code in the left is empty");
+			return setErrorMessage("Code in the left is empty");
 		}
 		if (credit >= 200) {
 			return setErrorMessage("Out of credit");
@@ -77,7 +77,7 @@ function App() {
 					className="btn border-blue-100 border-2 bg-gray-600 my-auto text-white"
 					onClick={closeModal}
 				>
-					close
+					Close
 				</button>
 			</Modal>
 			<div className="p-4 inline-flex justify-between w-full mt-4 ">
