@@ -1,5 +1,7 @@
 import axios, { AxiosResponse } from "axios";
-axios.defaults.baseURL = "https://api.jdoodle.com/v1";
+axios.defaults.baseURL =
+	"https://cors-anywhere.herokuapp.com/" + "https://api.jdoodle.com/v1";
+axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 interface AuthBody {
 	clientId: string;
 	clientSecret: string;
@@ -25,7 +27,8 @@ interface ExecuteError {
 }
 const auth: AuthBody = {
 	clientId: "9e4586cf0a0140c864cc63ceeb573393",
-	clientSecret: "b3ec885354973f0d4e30b874d85a1ee009641a6945b8847a6496ace59e9e281d"
+	clientSecret:
+		"b3ec885354973f0d4e30b874d85a1ee009641a6945b8847a6496ace59e9e281d"
 };
 function executeCode(
 	src: string,
@@ -44,7 +47,7 @@ export enum Language {
 }
 function getCredit() {
 	return axios.post<CreditRespone, AxiosResponse<CreditRespone>, AuthBody>(
-		"/credit",
+		"/credit-spent",
 		auth
 	);
 }
