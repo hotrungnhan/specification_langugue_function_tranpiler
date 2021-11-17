@@ -13,7 +13,7 @@ Top Down
 
 # for Whole project
 
-- ![90%](https://progress-bar.dev/0) # website (currently, it lack of hightlighting code)
+- ![100%](https://progress-bar.dev/100) # ~~website (Done)~~
 - ![20%](https://progress-bar.dev/10) # Unit test (necessary)
 
 # Run code platform
