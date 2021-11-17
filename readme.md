@@ -20,8 +20,20 @@ Top Down
 
 - https://docs.jdoodle.com/compiler-api/compiler-api
 
-# Docs
+# referece
+
+# idea
 
 - http://web.cse.ohio-state.edu/software/2231/web-sw2/extras/slides/21.Abstract-Syntax-Trees.pdf
 - https://github.com/DoctorWkt/acwj
 - https://daily.dev/blog/transpilers-how-they-work#transpilers-mechanism
+
+## lib doc
+
+- https://reactjs.org/
+- https://github.com/microsoft/monaco-editor
+- https://github.com/suren-atoyan/monaco-react
+
+## api doc
+
+- https://docs.jdoodle.com/compiler-api/compiler-api

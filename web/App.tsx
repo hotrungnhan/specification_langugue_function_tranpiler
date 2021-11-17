@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo, useRef } from "react";
 import Modal, { Styles } from "react-modal";
 import { FaInfoCircle } from "react-icons/fa";
-import Editor, { Monaco, useMonaco } from "@monaco-editor/react";
+import Editor, { useMonaco } from "@monaco-editor/react";
 import { specsTokenizer } from "@web/monaco-spec";
 const editorOptions = { minimap: { enabled: false } };
 Modal.setAppElement("#root");
@@ -45,7 +45,6 @@ function App() {
 		if (monaco) {
 			monaco.languages.register({ id: "specs" });
 			monaco.languages.setMonarchTokensProvider("specs", specsTokenizer);
-			console.log(monaco.languages);
 		}
 	}, [monaco]);
 
@@ -100,7 +99,7 @@ function App() {
 				</h2>
 				<p>{errorMessage}</p>
 				<button
-					className="btn border-blue-100 border-2 bg-gray-600 my-auto text-white"
+					className="btn border-blue-100 border-2 bg-green-400 my-auto text-white"
 					onClick={closeModal}
 				>
 					Close
@@ -113,42 +112,41 @@ function App() {
 						height="100%"
 						width="100%"
 						theme="github"
+						className="rounded-md"
 						loading={<h1 className="text-white">loading...</h1>}
 						language="specs"
 						options={editorOptions}
 					/>
 				</div>
 
-				<div className=" flex flex-col px-4 self-start gap-4">
-					<button className="btn border-blue-100 border-2 bg-gray-600 my-auto text-white ">
+				<div className=" flex flex-col px-4 gap-4 my-auto">
+					<button className="btn border-blue-100 border-2 bg-green-400 my-auto text-white ">
 						Tranpiler
 					</button>
 					<button
-						className="btn border-blue-100 border-2 bg-gray-600 my-auto text-white"
+						className="btn border-blue-100 border-2 bg-green-400 my-auto text-white"
 						onClick={executeCode}
 					>
 						Run
 					</button>
-					<button
-						className="btn border-blue-100 border-2 bg-gray-600 my-auto text-white"
-						onClick={executeCode}
-					>
-						TestModel
-					</button>
 					<select
 						value={language}
+						className="rounded-md p-2 text-center"
 						onChange={(event) => setLanguage(event.target.value)}
 					>
 						<option value="Javascript">Javascript</option>
 						<option value="Python">Python</option>
 					</select>
-					<p className="text-white">Current Credit: {credit}</p>
+					<p className="text-white text-center text-sm font-semibold">
+						Current Credit: {credit}
+					</p>
 				</div>
 				<div className="w-19/40 h-96">
 					<h1 className="text-xl text-white mb-4 pl-2">{language}</h1>
 					<Editor
 						height="100%"
 						width="100%"
+						className="rounded-md"
 						language={language.toLowerCase()}
 						theme="github"
 						loading={<h1 className="text-white">loading...</h1>}
