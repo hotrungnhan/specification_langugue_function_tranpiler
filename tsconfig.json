@@ -14,11 +14,11 @@
     "moduleResolution": "node",
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "src/tranpiler/*"
+      "@tranpiler/*": [
+        "tranpiler/*"
       ],
       "@web/*": [
-        "src/*"
+        "web/*"
       ]
     },
     "esModuleInterop": false,
@@ -36,8 +36,8 @@
     ]
   },
   "include": [
-    "src/tranpiler/**/*",
-    "src/tests/**/*",
-    "src/**/*",
+    "tranpiler/**/*",
+    "tests/**/*",
+    "web/**/*",
   ],
 }

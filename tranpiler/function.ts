@@ -1,6 +1,6 @@
-import { DataType } from "@web/tranpiler/token";
-import { FunctionVisitor } from "@web/tranpiler/visitor";
-import { ExprAST } from "@web/tranpiler/expr";
+import { DataType } from "@tranpiler/token";
+import { FunctionVisitor } from "@tranpiler/visitor";
+import { ExprAST } from "@tranpiler/expr";
 export class VariableIdentifier {
 	name: string;
 	type: DataType;

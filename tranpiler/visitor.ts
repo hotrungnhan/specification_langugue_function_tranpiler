@@ -1,5 +1,5 @@
-import { FunctionDecl } from "@web/tranpiler/function";
-import { ExprAST, BinaryExpr, Expr, DeclareVariableExpr } from "@web/tranpiler/expr";
+import { FunctionDecl } from "@tranpiler/function";
+import { ExprAST, BinaryExpr, Expr, DeclareVariableExpr } from "@tranpiler/expr";
 export interface FunctionVisitor {
 	visitFunction(f: FunctionDecl): string;
 	visitExprAST(AST: ExprAST): string;

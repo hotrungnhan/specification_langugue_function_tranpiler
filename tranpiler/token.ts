@@ -1,4 +1,4 @@
-import { Expr } from "@web/tranpiler/expr";
+import { Expr } from "@tranpiler/expr";
 
 export enum LitKind {
 	IntLit,

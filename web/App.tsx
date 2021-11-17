@@ -1,8 +1,11 @@
-import { useEffect, useState, useMemo } from "react";
-import Modal from "react-modal";
+import { useEffect, useState, useMemo, useRef } from "react";
+import Modal, { Styles } from "react-modal";
 import { FaInfoCircle } from "react-icons/fa";
+import Editor, { Monaco, useMonaco } from "@monaco-editor/react";
+import { specsTokenizer } from "@web/monaco-spec";
+const editorOptions = { minimap: { enabled: false } };
 Modal.setAppElement("#root");
-const modelType = {
+const modelType: Styles = {
 	content: {
 		top: "50%",
 		left: "50%",
@@ -10,11 +13,13 @@ const modelType = {
 		bottom: "auto",
 		marginRight: "-50%",
 		transform: "translate(-50%, -50%)"
+	},
+	overlay: {
+		zIndex: 1000
 	}
 };
 
 import * as Api from "@web/api";
-// import Highlight, { defaultProps } from "prism-react-renderer";
 function App() {
 	const [language, setLanguage] = useState("javascript");
 	const [credit, setCredit] = useState(0);
@@ -22,8 +27,10 @@ function App() {
 	const [stdin, setStdin] = useState("");
 	const [output, setOutput] = useState("");
 	const [errorMessage, setErrorMessage] = useState("");
+	const monaco = useMonaco();
 	const isModalOpen = useMemo(() => {
-		return errorMessage.trim() !== "";
+		if (typeof errorMessage === "string") return errorMessage.trim() !== "";
+		else return false;
 	}, [errorMessage]);
 
 	function closeModal() {
@@ -35,12 +42,27 @@ function App() {
 		python: Api.Language.py
 	};
 	useEffect(() => {
+		if (monaco) {
+			monaco.languages.register({ id: "specs" });
+			monaco.languages.setMonarchTokensProvider("specs", specsTokenizer);
+			console.log(monaco.languages);
+		}
+	}, [monaco]);
+
+	useEffect(() => {
 		Api.getCredit()
 			.then((res) => {
 				setCredit(res.data.used);
 			})
 			.catch((err) => {
-				setErrorMessage(err.message);
+				console.log(err);
+				if (err.response && err.response.error) {
+					console.log(err.response);
+					setErrorMessage(err.response.error);
+				} else if (err.response) {
+					console.log(err.response);
+					setErrorMessage(err.response);
+				} else setErrorMessage(err.message);
 			});
 	}, []); // [] as 2nd parameter is componentDidmount
 	function executeCode() {
@@ -57,7 +79,11 @@ function App() {
 				setOutput(res.data.output.trim());
 			})
 			.catch((err) => {
-				setErrorMessage(err.message);
+				if (err.response && err.response.error) {
+					setErrorMessage(err.response.error);
+				} else if (err.response) {
+					setErrorMessage(err.response);
+				} else setErrorMessage(err.message);
 			});
 	}
 	return (
@@ -67,7 +93,7 @@ function App() {
 				isOpen={isModalOpen}
 				onRequestClose={closeModal}
 				style={modelType}
-				contentLabel="Error model"
+				// contentLabel="Error model"
 			>
 				<h2 className="text-red-600 flex justify-start">
 					<FaInfoCircle /> Error
@@ -83,7 +109,14 @@ function App() {
 			<div className="p-4 inline-flex justify-between w-full mt-4 ">
 				<div className="w-19/40 h-96">
 					<h1 className="text-xl text-white mb-4 pl-2">Ngôn ngữ đặc tả</h1>
-					<textarea className=" resize-none w-full h-full p-4"></textarea>
+					<Editor
+						height="100%"
+						width="100%"
+						theme="github"
+						loading={<h1 className="text-white">loading...</h1>}
+						language="specs"
+						options={editorOptions}
+					/>
 				</div>
 
 				<div className=" flex flex-col px-4 self-start gap-4">
@@ -113,11 +146,16 @@ function App() {
 				</div>
 				<div className="w-19/40 h-96">
 					<h1 className="text-xl text-white mb-4 pl-2">{language}</h1>
-					<textarea
+					<Editor
+						height="100%"
+						width="100%"
+						language={language.toLowerCase()}
+						theme="github"
+						loading={<h1 className="text-white">loading...</h1>}
 						value={src}
-						onChange={(event) => setSrc(event.target.value)}
-						className="resize-none w-full h-full p-4"
-					></textarea>
+						options={editorOptions}
+						onChange={(newsrc) => (newsrc ? setSrc(newsrc) : setSrc(""))}
+					/>
 				</div>
 			</div>
 			<div className="inline-flex p-4 justify-between w-full">
@@ -126,16 +164,12 @@ function App() {
 					<textarea
 						value={stdin}
 						onChange={(event) => setStdin(event.target.value)}
-						className=" h-full resize-none w-full resize-non  p-4 "
+						className="text-area "
 					></textarea>
 				</div>
 				<div className="w-4/6 pl-4">
 					<h1 className="text-xl text-white py-4 pl-2">Console</h1>
-					<textarea
-						disabled
-						value={output}
-						className=" h-full resize-none w-full p-4"
-					>
+					<textarea disabled value={output} className="text-area">
 						some thing was there
 					</textarea>
 				</div>

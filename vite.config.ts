@@ -8,7 +8,7 @@ export default defineConfig({
 	base: "./",
 	resolve: {
 		alias: {
-			"@web": path.resolve(__dirname, "src")
+			"@web": path.resolve(__dirname, "web")
 		}
 	}
 });

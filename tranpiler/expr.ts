@@ -1,6 +1,6 @@
-import { LiTToken, NameToken, Token, TokenT, ValueToken } from "@web/tranpiler/token";
-import { FunctionVisitor } from "@web/tranpiler/visitor";
-import { VariableIdentifier } from "@web/tranpiler/function";
+import { LiTToken, NameToken, Token, TokenT, ValueToken } from "@tranpiler/token";
+import { FunctionVisitor } from "@tranpiler/visitor";
+import { VariableIdentifier } from "@tranpiler/function";
 type Operand = ValueToken | Expr;
 export class ExprAST {
 	topNode?: Expr;
