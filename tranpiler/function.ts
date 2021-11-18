@@ -1,6 +1,6 @@
 import { DataType } from "@tranpiler/token";
 import { FunctionVisitor } from "@tranpiler/visitor";
-import { ExprAST } from "@tranpiler/expr";
+import { Expr, MathExpr } from "@tranpiler/expr";
 export class VariableIdentifier {
 	name: string;
 	type: DataType;
@@ -8,19 +8,22 @@ export class VariableIdentifier {
 		this.name = name;
 		this.type = type;
 	}
+	Equal(cpr: VariableIdentifier) {
+		return cpr.name == this.name;
+	}
 }
 export class FunctionDecl {
 	functionName: string;
 	Parameter: Array<VariableIdentifier> = [];
-	Return: VariableIdentifier;
-	Pre: ExprAST;
-	Post: ExprAST;
+	Post: Array<Expr>;
+	Return?: VariableIdentifier;
+	Pre?: MathExpr;
 	constructor(
 		functionName: string,
 		Parameter: Array<VariableIdentifier>,
-		Return: VariableIdentifier,
-		Pre: ExprAST,
-		Post: ExprAST
+		Post: Array<Expr> = [],
+		Pre?: MathExpr,
+		Return?: VariableIdentifier
 	) {
 		this.functionName = functionName;
 		this.Parameter = Parameter;

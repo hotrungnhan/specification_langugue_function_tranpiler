@@ -1,24 +1,29 @@
-import { LiTToken, NameToken, Token, TokenT, ValueToken } from "@tranpiler/token";
+import {
+	LiTToken,
+	NameToken,
+	Operator,
+	Token,
+	TokenT,
+	ValueToken
+} from "@tranpiler/token";
 import { FunctionVisitor } from "@tranpiler/visitor";
 import { VariableIdentifier } from "@tranpiler/function";
-type Operand = ValueToken | Expr;
-export class ExprAST {
-	topNode?: Expr;
-	constructor(node?: Expr) {
-		this.topNode = node;
-	}
-	visitNode(visitor: FunctionVisitor): string {
-		if (this.topNode) {
-			return visitor.visitExpr(this.topNode);
-		} else {
-			return "";
-		}
-	}
-	static Parser(list: Array<Token>) {}
-}
+type Operand = LiTToken | Expr | VariableIdentifier;
 
-export abstract class Expr {}
-export abstract class MathExp extends Expr {
+export abstract class Expr {
+	static Parser(list: Array<Token>) {}
+	OperandParser(value: Operand | undefined, visitor: FunctionVisitor): string {
+		if (value instanceof MathExpr) {
+			return visitor.visitExpr(value);
+		} else if (value instanceof LiTToken) {
+			return visitor.visitLiterature(value);
+		} else if (value instanceof VariableIdentifier) {
+			return value.name;
+		}
+		return "";
+	}
+}
+export abstract class MathExpr extends Expr {
 	private token: Token;
 	constructor(token: Token) {
 		super();
@@ -28,23 +33,18 @@ export abstract class MathExp extends Expr {
 		return this.token.Type;
 	}
 }
-export abstract class KeywordExpr {}
-export class UnaryExpr extends MathExp {
+export abstract class KeywordExpr extends Expr {}
+export class UnaryExpr extends MathExpr {
 	right: Operand;
 	constructor(token: Token, right: Operand) {
 		super(token);
 		this.right = right;
 	}
-	visitRight(visitor: FunctionVisitor) {
-		if (this.right instanceof Expr) {
-			return visitor.visitExpr(this.right);
-		} else if (this.right instanceof ValueToken) {
-			return this.right.Value;
-		}
-		return "";
+	valueRight(visitor: FunctionVisitor) {
+		return this.OperandParser(this.right, visitor);
 	}
 }
-export class BinaryExpr extends MathExp {
+export class BinaryExpr extends MathExpr {
 	left: Operand;
 	right: Operand;
 	constructor(token: Token, left: Operand, right: Operand) {
@@ -52,21 +52,11 @@ export class BinaryExpr extends MathExp {
 		this.left = left;
 		this.right = right;
 	}
-	visitLeft(visitor: FunctionVisitor) {
-		if (this.left instanceof MathExp) {
-			return visitor.visitExpr(this.left);
-		} else if (this.left instanceof ValueToken) {
-			return this.left.Value;
-		}
-		return "";
+	valueLeft(visitor: FunctionVisitor) {
+		return this.OperandParser(this.left, visitor);
 	}
-	visitRight(visitor: FunctionVisitor) {
-		if (this.right instanceof MathExp) {
-			return visitor.visitExpr(this.right);
-		} else if (this.right instanceof ValueToken) {
-			return this.right.Value;
-		}
-		return "";
+	valueRight(visitor: FunctionVisitor) {
+		return this.OperandParser(this.right, visitor);
 	}
 }
 export class ForloopExpr extends Expr {
@@ -83,51 +73,57 @@ export class ForloopExpr extends Expr {
 	}
 }
 
-export class DeclareVariableExpr extends KeywordExpr {
+export class AssignExpr extends KeywordExpr {
 	private variable: VariableIdentifier;
-	private token?: LiTToken;
-	constructor(variable: VariableIdentifier, token?: LiTToken) {
+	private value?: LiTToken | VariableIdentifier | MathExpr;
+	constructor(
+		variable: VariableIdentifier,
+		value?: LiTToken | VariableIdentifier | MathExpr
+	) {
 		super();
 		this.variable = variable;
-		this.token = token || undefined;
+		this.value = value || undefined;
+	}
+	get HasValue() {
+		return this.value != null;
 	}
 	get DataType() {
-		return this.variable.type;
+		if (this.value instanceof LiTToken) {
+			return this.variable.type;
+		} else if (this.value instanceof VariableIdentifier) {
+			return this.value.type;
+		} else if (this.value instanceof MathExpr) {
+			return null; // dont check type of expr
+		}
+		return null;
 	}
-	get Name() {
+	get Identifier() {
+		return this.variable;
+	}
+	get VariableName() {
 		return this.variable.name;
 	}
-	get valueToken() {
-		return this.token;
+	Value(visitor: FunctionVisitor): string {
+		return this.OperandParser(this.value, visitor);
 	}
 }
 export class IfElseExpr extends KeywordExpr {
-	private condition: Expr;
-	private mainbody: Expr;
-	private elsebody: Expr;
-
-	constructor(condition: Expr, body: Expr, elsebody: Expr) {
+	private condition: MathExpr;
+	private right: Expr;
+	private wrong?: Expr;
+	constructor(condition: MathExpr, right: Expr, wrong?: Expr) {
 		super();
-		this.mainbody = body;
-		this.elsebody = elsebody;
+		this.right = right;
+		this.wrong = wrong;
 		this.condition = condition;
 	}
-}
-export class ForLoopExpr extends KeywordExpr {
-	private token: Token; //tt vm ...
-	private loopvariable: DeclareVariableExpr;
-	private body: Expr;
-	private assign: Expr;
-	constructor(
-		token: Token,
-		loopvariable: DeclareVariableExpr,
-		body: Expr,
-		assign: Expr
-	) {
-		super();
-		this.token = token;
-		this.loopvariable = loopvariable;
-		this.body = body;
-		this.assign = assign;
+	get Condition() {
+		return this.condition;
+	}
+	get Right() {
+		return this.right;
+	}
+	get Wrong() {
+		return this.wrong;
 	}
 }

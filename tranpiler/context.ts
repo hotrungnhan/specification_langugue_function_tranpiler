@@ -1,5 +1,32 @@
-export class FunctionContext {
+import { VariableIdentifier } from "./function";
+
+export class VariableContext {
+	variable: Array<VariableIdentifier> = [];
+	isVariableExist(vi: VariableIdentifier) {
+		return this.variable.find((value) => {
+			return value.Equal(vi);
+		});
+	}
+
+	concatVariable(vi: VariableIdentifier[]) {
+		this.variable = this.variable.concat(vi);
+	}
+	pushVariable(...vi: VariableIdentifier[]) {
+		this.variable.concat(vi);
+	}
+	reset() {
+		this.variable = [];
+	}
+}
+export class FunctionContext extends VariableContext {
 	level: Blocklevel = new Blocklevel();
+	constructor() {
+		super();
+	}
+	reset() {
+		this.level.reset();
+		super.reset();
+	}
 }
 class Blocklevel {
 	level = 0;
@@ -13,5 +40,8 @@ class Blocklevel {
 	}
 	getSpaceByLevel() {
 		return " ".repeat(4 * this.level);
+	}
+	reset() {
+		this.level = 0;
 	}
 }

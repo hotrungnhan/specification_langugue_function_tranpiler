@@ -2,11 +2,11 @@ import { Operator, LitKind } from "@tranpiler/token";
 import { LiTToken, ValueToken } from "@tranpiler/token";
 import { FunctionDecl } from "@tranpiler/function";
 import {
-	ExprAST,
 	BinaryExpr,
 	UnaryExpr,
 	Expr,
-	DeclareVariableExpr
+	AssignExpr,
+	IfElseExpr
 } from "@tranpiler/expr";
 import { FunctionContext } from "@tranpiler/context";
 import { FunctionVisitor } from "@tranpiler/visitor";
@@ -29,23 +29,38 @@ export class JavascriptFunctionVisitor
 				output += param.name + ",";
 			}
 		});
+		this.concatVariable(f.Parameter);
 		output += "){\n";
 		// declare output variable
 		this.level.incre();
-		output += this.visitDeclareVariable(new DeclareVariableExpr(f.Return));
-		output += this.visitExprAST(f.Pre);
-		output += this.visitExprAST(f.Post);
+		if (f.Return) {
+			output += this.genCommand(this.visitAssignExpr(new AssignExpr(f.Return)));
+		}
+		if (f.Pre) {
+			output += this.visitExpr(f.Pre);
+		}
+		f.Post.forEach((post) => {
+			output += this.visitExpr(post);
+		});
 		output += "}";
+		this.reset();
 		return output;
 	}
-	visitDeclareVariable(expr: DeclareVariableExpr): string {
-		if (expr.valueToken) {
-			return this.genCommand(
-				`let ${expr.Name} = ${this.visitLiterature(expr.valueToken)}`
-			);
+	visitAssignExpr(expr: AssignExpr): string {
+		if (!this.isVariableExist(expr.Identifier)) {
+			let rt = "let";
+			this.pushVariable(expr.Identifier);
+			if (expr.HasValue) {
+				return `${rt} ${expr.VariableName} = ${expr.Value(this)}`;
+			} else {
+				return `${rt} ${expr.VariableName}`;
+			}
 		} else {
-			return this.genCommand(`let ${expr.Name}`);
+			if (expr.HasValue) {
+				return `${expr.VariableName} = ${expr.Value(this)}`;
+			}
 		}
+		return "";
 	}
 	visitLiterature(tok: LiTToken): string {
 		switch (tok.Kind) {
@@ -57,9 +72,6 @@ export class JavascriptFunctionVisitor
 		}
 		return "";
 	}
-	visitExprAST(ast: ExprAST): string {
-		return ast.visitNode(this);
-	}
 	visitExpr(e: Expr): string {
 		if (e instanceof UnaryExpr) {
 			return this.visitUnary(e);
@@ -67,15 +79,18 @@ export class JavascriptFunctionVisitor
 		if (e instanceof BinaryExpr) {
 			return this.visitBinary(e);
 		}
-		if (e instanceof DeclareVariableExpr) {
-			return this.visitDeclareVariable(e);
+		if (e instanceof AssignExpr) {
+			return this.visitAssignExpr(e);
+		}
+		if (e instanceof IfElseExpr) {
+			return this.visitIfElseExpr(e);
 		}
 		return "";
 	}
 	visitUnary(expr: UnaryExpr): string {
 		switch (expr.type) {
 			case Operator.NOT:
-				return `!${expr.visitRight(this)}`;
+				return `!${expr.valueRight(this)}`;
 		}
 		return "";
 	}
@@ -84,33 +99,60 @@ export class JavascriptFunctionVisitor
 			// case Operator.ASSIGN:
 			// return `(${expr.visitLeft(this)} = ${expr.visitRight(this)})`;
 			case Operator.PLUS:
-				return `(${expr.visitLeft(this)} + ${expr.visitRight(this)})`;
+				return `(${expr.valueRight(this)} + ${expr.valueRight(this)})`;
 			case Operator.MINUS:
-				return `(${expr.visitLeft(this)} - ${expr.visitRight(this)})`;
+				return `(${expr.valueRight(this)} - ${expr.valueRight(this)})`;
 			case Operator.STAR:
-				return `(${expr.visitLeft(this)} * ${expr.visitRight(this)})`;
+				return `(${expr.valueRight(this)} * ${expr.valueRight(this)})`;
 			case Operator.SLASH:
-				return `(${expr.visitLeft(this)} / ${expr.visitRight(this)})`;
+				return `(${expr.valueRight(this)} / ${expr.valueRight(this)})`;
 			case Operator.PERCENT:
-				return `(${expr.visitLeft(this)} % ${expr.visitRight(this)})`;
+				return `(${expr.valueLeft(this)} % ${expr.valueRight(this)})`;
 			case Operator.GREATER:
-				return `(${expr.visitLeft(this)} > ${expr.visitRight(this)})`;
+				return `(${expr.valueLeft(this)} > ${expr.valueRight(this)})`;
 			case Operator.LESSER:
-				return `(${expr.visitLeft(this)} < ${expr.visitRight(this)})`;
+				return `(${expr.valueLeft(this)} < ${expr.valueRight(this)})`;
 			case Operator.EQUALS:
-				return `(${expr.visitLeft(this)} == ${expr.visitRight(this)})`;
+				return `(${expr.valueLeft(this)} == ${expr.valueRight(this)})`;
 			case Operator.NOT_EQUAL:
-				return `(${expr.visitLeft(this)} != ${expr.visitRight(this)})`;
+				return `(${expr.valueLeft(this)} != ${expr.valueRight(this)})`;
 			case Operator.GREATER_EQUAL:
-				return `(${expr.visitLeft(this)} >= ${expr.visitRight(this)})`;
+				return `(${expr.valueLeft(this)} >= ${expr.valueRight(this)})`;
 			case Operator.LESSER_EQUAL:
-				return `(${expr.visitLeft(this)} <= ${expr.visitRight(this)})`;
+				return `(${expr.valueLeft(this)} <= ${expr.valueRight(this)})`;
 			case Operator.AND:
-				return `(${expr.visitLeft(this)} && ${expr.visitRight(this)})`;
+				return `(${expr.valueLeft(this)} && ${expr.valueRight(this)})`;
 			case Operator.OR:
-				return `(${expr.visitLeft(this)} || ${expr.visitRight(this)})`;
+				return `(${expr.valueLeft(this)} || ${expr.valueRight(this)})`;
 		}
 		return "";
+	}
+	visitIfElseExpr(ifElse: IfElseExpr): string {
+		let ctx = "";
+		this.visitExpr;
+		ctx +=
+			this.level.getSpaceByLevel() +
+			`if ${this.visitExpr(ifElse.Condition)}{\n`;
+		this.level.incre();
+		ctx += this.genCommand(this.visitExpr(ifElse.Right));
+		if (ifElse.Wrong instanceof IfElseExpr) {
+			this.level.decre();
+			ctx += this.level.getSpaceByLevel() + `} else `;
+			ctx += this.visitIfElseExpr(ifElse.Wrong);
+			// this.level.decre();
+			ctx += this.level.getSpaceByLevel() + "}\n";
+		} else if (ifElse.Wrong) {
+			this.level.decre();
+			ctx += this.level.getSpaceByLevel() + `} else {\n`;
+			this.level.incre();
+			ctx += this.genCommand(this.visitExpr(ifElse.Wrong));
+			this.level.decre();
+			ctx += this.level.getSpaceByLevel() + "}\n";
+		} else {
+			this.level.decre();
+			ctx += this.level.getSpaceByLevel() + "}\n";
+		}
+		return ctx;
 	}
 	// visitForLoop(AST: ForloopExpr): string {
 	// 	return "";

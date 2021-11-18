@@ -1,11 +1,13 @@
 import { FunctionDecl } from "@tranpiler/function";
-import { ExprAST, BinaryExpr, Expr, DeclareVariableExpr } from "@tranpiler/expr";
+import { BinaryExpr, Expr, AssignExpr, IfElseExpr } from "@tranpiler/expr";
+import { LiTToken } from "@tranpiler/token";
 export interface FunctionVisitor {
 	visitFunction(f: FunctionDecl): string;
-	visitExprAST(AST: ExprAST): string;
 	visitExpr(expr: Expr): string;
 	visitUnary(expr: BinaryExpr): string;
 	visitBinary(expr: BinaryExpr): string;
-	visitDeclareVariable(expr: DeclareVariableExpr): string;
+	visitAssignExpr(expr: AssignExpr): string;
+	visitLiterature(tok: LiTToken): string;
+	visitIfElseExpr(ifElse: IfElseExpr): string;
 	// visitForLoop(AST: ForloopExpr): string;
 }

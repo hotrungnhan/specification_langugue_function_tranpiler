@@ -1,81 +1,62 @@
 import { expect, should } from "chai";
 import { JavascriptFunctionVisitor } from "@tranpiler/visitor/jsvisitor";
 import { FunctionDecl, VariableIdentifier } from "@tranpiler/function";
-import { ExprAST, BinaryExpr, UnaryExpr } from "@tranpiler/expr";
-import util from "util";
 import {
-	Token,
-	Operator,
-	LiTToken,
-	DataType,
-	LitKind,
-	NameToken
-} from "@tranpiler/token";
-let f = new FunctionDecl(
-	"HelloWorld",
-	[],
-	new VariableIdentifier("kq", DataType.B),
-	new ExprAST(),
-	new ExprAST()
-);
+	BinaryExpr,
+	UnaryExpr,
+	IfElseExpr,
+	AssignExpr,
+	Expr
+} from "@tranpiler/expr";
+import util from "util";
+import { Token, Operator, LiTToken, DataType, LitKind } from "@tranpiler/token";
+
 let js = new JavascriptFunctionVisitor();
 describe("visitor test", function () {
-	it("main function declare", () => {
+	it("function return", () => {
+		let f = new FunctionDecl(
+			"HelloWorld",
+			[],
+			[],
+			undefined,
+			new VariableIdentifier("kq", DataType.B)
+		);
 		let kq = js.visitFunction(f);
 		expect(kq).equal(`function HelloWorld(){
     let kq;
 }`);
 	});
-	it("unary visit", () => {
-		let ast = new ExprAST(
-			new UnaryExpr(
-				new Token(Operator.NOT),
-				new LiTToken("True", LitKind.StringLit)
-			)
-		); // ( (5||10 ) && 5
-		let kq = js.visitExprAST(ast);
-		expect(kq).to.be.equal("!True");
+	it("declare Visit", () => {
+		let f = new FunctionDecl(
+			"HelloWorld",
+			[
+				new VariableIdentifier("p1", DataType.N_STAR),
+				new VariableIdentifier("p2", DataType.CHAR_STAR)
+			],
+			[],
+			undefined,
+			new VariableIdentifier("kq", DataType.B)
+		);
+		let kq = js.visitFunction(f);
+		expect(kq).to.be.equal(`function HelloWorld(p1,p2){
+    let kq;
+}`);
 	});
-	it("binary visit expr", () => {
-		let ast = new ExprAST(
-			new BinaryExpr(
-				new Token(Operator.AND),
-				new BinaryExpr(
-					new Token(Operator.OR),
-					new LiTToken(10, LitKind.IntLit),
-					new LiTToken(5, LitKind.IntLit)
-				),
-				new LiTToken(5, LitKind.IntLit)
-			)
-		); // ( (5||10 ) && 5
-		let kq = js.visitExprAST(ast);
-		expect(kq).to.be.equal("((10 || 5) && 5)");
-	});
-	it("unary visit expr", () => {
-		let ast = new ExprAST(
-			new BinaryExpr(
-				new Token(Operator.AND),
-				new UnaryExpr(new Token(Operator.NOT), new LiTToken(5, LitKind.IntLit)),
-				new LiTToken(5, LitKind.IntLit)
-			)
-		); // ( (5||10 ) && 5
-		let kq = js.visitExprAST(ast);
-		expect(kq).to.be.equal("(!5 && 5)");
-	});
-	it("binary visit expr", () => {
-		let ast = new ExprAST(
-			new BinaryExpr(
-				new Token(Operator.AND),
-				new BinaryExpr(
-					new Token(Operator.OR),
-					new LiTToken(10, LitKind.IntLit),
-					new LiTToken(5, LitKind.IntLit)
-				),
-				new LiTToken(5, LitKind.IntLit)
-			)
-		); // ( (5||10 ) && 5
-		let kq = js.visitExprAST(ast);
-		expect(kq == "(10 || 5) && 5");
+	it("set variable which already declare on parameter", () => {
+		let f = new FunctionDecl(
+			"HelloWorld",
+			[
+				new VariableIdentifier("p1", DataType.N_STAR),
+				new VariableIdentifier("p2", DataType.CHAR_STAR)
+			],
+			[new AssignExpr(new VariableIdentifier("p1", DataType.N_STAR))],
+			undefined,
+			new VariableIdentifier("kq", DataType.B)
+		);
+		let kq = js.visitFunction(f);
+		expect(kq).to.be.equal(`function HelloWorld(p1,p2){
+    let kq;
+}`);
 	});
 });
-export {}
+export {};
