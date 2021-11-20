@@ -1,9 +1,7 @@
-import { Expr } from "@tranpiler/expr";
-
 export enum LitKind {
-	IntLit,
-	FloatLit,
-	StringLit
+	IntLit = "int",
+	FloatLit = "float",
+	StringLit = "string"
 }
 export type TokenT =
 	| Basic
@@ -46,9 +44,9 @@ export enum DataType {
 	N = "N", // N // natural
 	B = "B", // B // boolean
 	Z = "Z", // Z // integer
-	CHAR_STAR = "N*", // N* // Natual array
-	R_STAR = "R*", // R* // Real array
-	N_STAR = "N*" // N* // Natual array
+	CHAR_STAR = "char*", // char
+	Z_STAR = "Z*", // char
+	R_STAR = "R*" // char
 }
 export enum Operator {
 	// *** operator
@@ -57,8 +55,8 @@ export enum Operator {
 	STAR = "*", // *
 	SLASH = "/", // /
 	PERCENT = "%", // %
-	GREATER = ">=", // >=
-	LESSER = "<=", // <=
+	GREATER = ">", // >
+	LESSER = "<", // <
 	EQUALS = "=", // =
 	ASSIGN = "=", // =
 	NOT_EQUAL = "!=", // !=
@@ -68,7 +66,11 @@ export enum Operator {
 	AND = "&&", // &&
 	OR = "||" // ||
 }
-
+export const keywordArray: string[] = [
+	...(Object.values(DataType) as string[]),
+	...(Object.values(LoopType) as string[]),
+	...(Object.values(Keyword) as string[])
+];
 export class Token {
 	private type: TokenT;
 	constructor(type: TokenT) {

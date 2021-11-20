@@ -12,7 +12,7 @@ export class VariableContext {
 		this.variable = this.variable.concat(vi);
 	}
 	pushVariable(...vi: VariableIdentifier[]) {
-		this.variable.concat(vi);
+		this.variable = this.variable.concat(vi);
 	}
 	reset() {
 		this.variable = [];
@@ -24,8 +24,8 @@ export class FunctionContext extends VariableContext {
 		super();
 	}
 	reset() {
-		this.level.reset();
 		super.reset();
+		this.level.reset();
 	}
 }
 class Blocklevel {

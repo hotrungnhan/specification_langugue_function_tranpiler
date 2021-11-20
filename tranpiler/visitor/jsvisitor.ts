@@ -1,4 +1,4 @@
-import { Operator, LitKind } from "@tranpiler/token";
+import { Operator, LitKind, LoopType } from "@tranpiler/token";
 import { LiTToken, ValueToken } from "@tranpiler/token";
 import { FunctionDecl } from "@tranpiler/function";
 import {
@@ -6,9 +6,11 @@ import {
 	UnaryExpr,
 	Expr,
 	AssignExpr,
-	IfElseExpr
+	IfElseExpr,
+	CommandExpr,
+	LoopExpr
 } from "@tranpiler/expr";
-import { FunctionContext } from "@tranpiler/context";
+import { FunctionContext, VariableContext } from "@tranpiler/context";
 import { FunctionVisitor } from "@tranpiler/visitor";
 export class JavascriptFunctionVisitor
 	extends FunctionContext
@@ -24,9 +26,9 @@ export class JavascriptFunctionVisitor
 		f.Parameter.forEach((param, index, arr) => {
 			if (index == arr.length - 1) {
 				// last parameter
-				output += param.name;
+				output += param.Name;
 			} else {
-				output += param.name + ",";
+				output += param.Name + ",";
 			}
 		});
 		this.concatVariable(f.Parameter);
@@ -37,7 +39,9 @@ export class JavascriptFunctionVisitor
 			output += this.genCommand(this.visitAssignExpr(new AssignExpr(f.Return)));
 		}
 		if (f.Pre) {
-			output += this.visitExpr(f.Pre);
+			output += this.visitExpr(
+				new IfElseExpr(f.Pre, new CommandExpr("Return"))
+			);
 		}
 		f.Post.forEach((post) => {
 			output += this.visitExpr(post);
@@ -46,10 +50,11 @@ export class JavascriptFunctionVisitor
 		this.reset();
 		return output;
 	}
-	visitAssignExpr(expr: AssignExpr): string {
-		if (!this.isVariableExist(expr.Identifier)) {
+	visitAssignExpr(expr: AssignExpr, context?: VariableContext): string {
+		let ctx: VariableContext = context ? context : this;
+		if (!ctx.isVariableExist(expr.Identifier)) {
 			let rt = "let";
-			this.pushVariable(expr.Identifier);
+			ctx.pushVariable(expr.Identifier);
 			if (expr.HasValue) {
 				return `${rt} ${expr.VariableName} = ${expr.Value(this)}`;
 			} else {
@@ -85,7 +90,16 @@ export class JavascriptFunctionVisitor
 		if (e instanceof IfElseExpr) {
 			return this.visitIfElseExpr(e);
 		}
+		if (e instanceof LoopExpr) {
+			return this.visitLoop(e);
+		}
+		if (e instanceof CommandExpr) {
+			return this.visitCommandExpr(e);
+		}
 		return "";
+	}
+	visitCommandExpr(cm: CommandExpr) {
+		return cm.Command;
 	}
 	visitUnary(expr: UnaryExpr): string {
 		switch (expr.type) {
@@ -129,7 +143,6 @@ export class JavascriptFunctionVisitor
 	}
 	visitIfElseExpr(ifElse: IfElseExpr): string {
 		let ctx = "";
-		this.visitExpr;
 		ctx +=
 			this.level.getSpaceByLevel() +
 			`if ${this.visitExpr(ifElse.Condition)}{\n`;
@@ -154,7 +167,27 @@ export class JavascriptFunctionVisitor
 		}
 		return ctx;
 	}
-	// visitForLoop(AST: ForloopExpr): string {
-	// 	return "";
-	// }
+	visitLoop(loop: LoopExpr): string {
+		let loopcontext = new VariableContext();
+		let ctx = "";
+		ctx +=
+			this.level.getSpaceByLevel() +
+			`for (${this.visitAssignExpr(loop.Variable, loopcontext)};`;
+		loopcontext.pushVariable(loop.Identifier);
+		ctx += `${this.visitBinary(loop.ConditionExpr)};${this.visitAssignExpr(
+			loop.IncrementByOne,
+			loopcontext
+		)}){\n`;
+		this.level.incre();
+		if (loop.Type == LoopType.TT) {
+			// ctx += this.visitExpr();
+		} else if (loop.Type == LoopType.VM) {
+		}
+		this.level.decre();
+		// if (loop.Body) {
+		// 	ctx += this.visitExpr(loop.Body);
+		// }
+		ctx += this.level.getSpaceByLevel() + "}\n";
+		return ctx;
+	}
 }

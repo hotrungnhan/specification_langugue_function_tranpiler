@@ -1,15 +1,23 @@
 import { expect, should } from "chai";
 import { JavascriptFunctionVisitor } from "@tranpiler/visitor/jsvisitor";
-import { FunctionDecl, VariableIdentifier } from "@tranpiler/function";
+import { FunctionDecl, VariableIdentifier } from "@tranpiler/expr";
 import {
 	BinaryExpr,
 	UnaryExpr,
 	IfElseExpr,
 	AssignExpr,
-	Expr
+	Expr,
+	LoopExpr
 } from "@tranpiler/expr";
 import util from "util";
-import { Token, Operator, LiTToken, DataType, LitKind } from "@tranpiler/token";
+import {
+	Token,
+	Operator,
+	LiTToken,
+	DataType,
+	LitKind,
+	LoopType
+} from "@tranpiler/token";
 
 let js = new JavascriptFunctionVisitor();
 describe("visitor test", function () {
@@ -30,7 +38,7 @@ describe("visitor test", function () {
 		let f = new FunctionDecl(
 			"HelloWorld",
 			[
-				new VariableIdentifier("p1", DataType.N_STAR),
+				new VariableIdentifier("p1", DataType.Z_STAR),
 				new VariableIdentifier("p2", DataType.CHAR_STAR)
 			],
 			[],
@@ -46,10 +54,10 @@ describe("visitor test", function () {
 		let f = new FunctionDecl(
 			"HelloWorld",
 			[
-				new VariableIdentifier("p1", DataType.N_STAR),
+				new VariableIdentifier("p1", DataType.Z_STAR),
 				new VariableIdentifier("p2", DataType.CHAR_STAR)
 			],
-			[new AssignExpr(new VariableIdentifier("p1", DataType.N_STAR))],
+			[new AssignExpr(new VariableIdentifier("p1", DataType.Z_STAR))],
 			undefined,
 			new VariableIdentifier("kq", DataType.B)
 		);
@@ -57,6 +65,33 @@ describe("visitor test", function () {
 		expect(kq).to.be.equal(`function HelloWorld(p1,p2){
     let kq;
 }`);
+	});
+	it("whileloop", () => {
+		js.reset();
+		let f = new FunctionDecl(
+			"HelloWorld",
+			[
+				new VariableIdentifier("p1", DataType.Z_STAR),
+				new VariableIdentifier("p2", DataType.CHAR_STAR)
+			],
+			[
+				new LoopExpr(
+					LoopType.VM,
+					new LiTToken(0, LitKind.IntLit),
+					new LiTToken(5, LitKind.IntLit),
+					new VariableIdentifier("i", DataType.N),
+					new BinaryExpr(
+						new Token(Operator.AND),
+						new LiTToken(5, LitKind.IntLit),
+						new LiTToken(5, LitKind.IntLit)
+					)
+				)
+			],
+			undefined,
+			new VariableIdentifier("kq", DataType.B)
+		);
+		let kq = js.visitFunction(f);
+		expect(kq).to.be.equal("");
 	});
 });
 export {};

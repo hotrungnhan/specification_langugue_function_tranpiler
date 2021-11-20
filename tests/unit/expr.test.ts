@@ -1,15 +1,23 @@
 import { expect, should } from "chai";
 import { JavascriptFunctionVisitor } from "@tranpiler/visitor/jsvisitor";
-import { FunctionDecl, VariableIdentifier } from "@tranpiler/function";
+import { FunctionDecl, VariableIdentifier } from "@tranpiler/expr";
 import {
 	BinaryExpr,
 	UnaryExpr,
 	IfElseExpr,
 	AssignExpr,
-	Expr
+	Expr,
+	LoopExpr
 } from "@tranpiler/expr";
 import util from "util";
-import { Token, Operator, LiTToken, DataType, LitKind } from "@tranpiler/token";
+import {
+	Token,
+	Operator,
+	LiTToken,
+	DataType,
+	LitKind,
+	LoopType
+} from "@tranpiler/token";
 
 let js = new JavascriptFunctionVisitor();
 describe("expr test", function () {
@@ -65,27 +73,35 @@ describe("expr test", function () {
 			new VariableIdentifier("abc", DataType.N),
 			new LiTToken("cdf", LitKind.StringLit)
 		); // ( (5||10 ) && 5
+
 		let kq = js.visitExpr(ast);
+		js.reset();
 		expect(kq).to.be.equal("let abc = (5 && 5)");
 		kq = js.visitExpr(ast2);
+		js.reset();
 		expect(kq).to.be.equal("let abc = cdf");
 		kq = js.visitExpr(ast3);
+		js.reset();
 		expect(kq).to.be.equal('let abc = "cdf"');
 	});
 	it("whileloop", () => {
 		js.reset();
-		let f = new FunctionDecl(
-			"HelloWorld",
-			[
-				new VariableIdentifier("p1", DataType.N_STAR),
-				new VariableIdentifier("p2", DataType.CHAR_STAR)
-			],
-			[],
-			undefined,
-			new VariableIdentifier("kq", DataType.B)
+		let f = new LoopExpr(
+			LoopType.VM,
+			new LiTToken(0, LitKind.IntLit),
+			new LiTToken(5, LitKind.IntLit),
+			new VariableIdentifier("i", DataType.N),
+			new BinaryExpr(
+				new Token(Operator.AND),
+				new LiTToken(5, LitKind.IntLit),
+				new LiTToken(5, LitKind.IntLit)
+			)
 		);
+		let kq = js.visitLoop(f);
+		expect(kq).to.be.equal("");
 	});
 	it("ifelse", () => {
+		js.reset();
 		let f = new IfElseExpr(
 			new BinaryExpr(
 				new Token(Operator.AND),
@@ -97,6 +113,7 @@ describe("expr test", function () {
 				new LiTToken("p5", LitKind.StringLit)
 			)
 		);
+		js.reset();
 		let kq = js.visitIfElseExpr(f);
 		expect(kq).to.be.equal('if (p2 && p2){\n    let p2 = "p5";\n}\n');
 		f = new IfElseExpr(
@@ -114,6 +131,7 @@ describe("expr test", function () {
 				new LiTToken("p5", LitKind.StringLit)
 			)
 		);
+		js.reset();
 		kq = js.visitIfElseExpr(f);
 		expect(kq).to.be.equal(
 			'if (p2 && p2){\n    let p2 = "p5";\n} else {\n    let p2 = "p5";\n}\n'
@@ -155,8 +173,12 @@ describe("expr test", function () {
 				)
 			)
 		);
+		js.reset();
 		kq = js.visitIfElseExpr(f);
-		expect(kq).to.be.equal('if (p2 && p2){\n    let p2 = "p5";\n} else if (p2 && p2){\n    let p2 = "p5";\n} else if (p2 && p2){\n    let p2 = "p5";\n} else {\n    let p2 = "p5";\n}\n}\n}\n');
+
+		expect(kq).to.be.equal(
+			'if (p2 && p2){\n    let p2 = "p5";\n} else if (p2 && p2){\n    let p2 = "p5";\n} else if (p2 && p2){\n    let p2 = "p5";\n} else {\n    let p2 = "p5";\n}\n}\n}\n'
+		);
 	});
 });
 export {};

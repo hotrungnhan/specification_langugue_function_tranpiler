@@ -1,4 +1,4 @@
-import { FunctionDecl } from "@tranpiler/function";
+import { FunctionDecl } from "@tranpiler/expr";
 import { BinaryExpr, Expr, AssignExpr, IfElseExpr } from "@tranpiler/expr";
 import { LiTToken } from "@tranpiler/token";
 export interface FunctionVisitor {
