@@ -22,8 +22,8 @@ export {};
 
 describe("scanner test", function () {
 	it("number && sign number", () => {
-		let scanner = new Scanner("2312   123.2323 2132 -29320");
-		scanner.scan();
+		let scanner = new Scanner();
+		let token = scanner.scan("2312   123.2323 2132 -29320");
 		let kq = [
 			new LiTToken(2312, LitKind.IntLit),
 			new LiTToken(123.2323, LitKind.FloatLit),
@@ -32,11 +32,11 @@ describe("scanner test", function () {
 			new LiTToken(29320, LitKind.IntLit),
 			new Token(Basic.EOF)
 		];
-		expect(scanner.Token).to.be.deep.equal(kq);
+		expect(token).to.be.deep.equal(kq);
 	});
 	it("number && token", () => {
-		let scanner = new Scanner("2312   VM abcszy TT");
-		scanner.scan();
+		let scanner = new Scanner();
+		let token = scanner.scan("2312   VM abcszy TT");
 		let kq = [
 			new LiTToken(2312, LitKind.IntLit),
 			new Token(LoopType.VM),
@@ -44,11 +44,11 @@ describe("scanner test", function () {
 			new Token(LoopType.TT),
 			new Token(Basic.EOF)
 		];
-		expect(scanner.Token).to.be.deep.equal(kq);
+		expect(token).to.be.deep.equal(kq);
 	});
 	it("simple scanner", () => {
-		let scanner = new Scanner("Ham (a:R*, n:N)kq:B\npre\npost");
-		scanner.scan();
+		let scanner = new Scanner();
+		let token = scanner.scan("Ham (a:R*, n:N)kq:B\npre\npost");
 		let kq = [
 			new LiTToken("Ham", LitKind.StringLit),
 			new Token(Delemiter.LPRAREN),
@@ -67,11 +67,11 @@ describe("scanner test", function () {
 			new Token(Keyword.POST),
 			new Token(Basic.EOF)
 		];
-		expect(scanner.Token).to.be.deep.equal(kq);
+		expect(token).to.be.deep.equal(kq);
 	});
 	it("complex", () => {
-		let scanner = new Scanner("Ham (a:R*, n:N)kq:B\npre a>0\npost");
-		scanner.scan();
+		let scanner = new Scanner();
+		let token = scanner.scan("Ham (a:R*, n:N)kq:B\npre a>0\npost");
 		let kq = [
 			new LiTToken("Ham", LitKind.StringLit),
 			new Token(Delemiter.LPRAREN),
@@ -93,13 +93,13 @@ describe("scanner test", function () {
 			new Token(Keyword.POST),
 			new Token(Basic.EOF)
 		];
-		expect(scanner.Token).to.be.deep.equal(kq);
+		expect(token).to.be.deep.equal(kq);
 	});
 	it("more complex", () => {
-		let scanner = new Scanner(
+		let scanner = new Scanner();
+		let token = scanner.scan(
 			"Ham (a:R*, n:Z*)kq:B\npre a>0\npost a=23 && a=24"
 		);
-		scanner.scan();
 		let kq = [
 			new LiTToken("Ham", LitKind.StringLit),
 			new Token(Delemiter.LPRAREN),
@@ -128,6 +128,6 @@ describe("scanner test", function () {
 			new LiTToken(24, LitKind.IntLit),
 			new Token(Basic.EOF)
 		];
-		expect(scanner.Token).to.be.deep.equal(kq);
+		expect(token).to.be.deep.equal(kq);
 	});
 });

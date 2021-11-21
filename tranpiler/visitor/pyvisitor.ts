@@ -1,25 +1,37 @@
-// }
-// export class PythonFunctionVisitor implements FunctionVisitor {
-// 	visitFunction(f: FunctionDecl): string {
-// 		let currentBlockLevel = new Blocklevel();
-// 		let ctx = `def ${f.functionName}`;
-// 		ctx += "(";
-// 		f.Parameter.forEach((param, index, arr) => {
-// 			if (index == arr.length - 1) {
-// 				// last parameter
-// 				ctx += param.name;
-// 			} else {
-// 				ctx += param.name + ",";
-// 			}
-// 		});
-// 		ctx += "):\n";
-// 		currentBlockLevel.incre();
-// 		ctx += this.visitExprAST(f.Pre);
-// 		ctx += this.visitExprAST(f.Pre);
-// 		return ctx;
-// 	}
-// 	visitExprAST(AST: ExprAST): string {
-// 		return "";
-// 	}
-// }
-export {}
+import {
+	Expr,
+	BinaryExpr,
+	AssignExpr,
+	IfElseExpr,
+	FunctionDecl
+} from "@tranpiler/expr";
+import { LiTToken } from "@tranpiler/token";
+import { FunctionVisitor } from "@tranpiler/visitor";
+
+export class PythonFunctionVisitor implements FunctionVisitor {
+	visitExpr(expr: Expr): string {
+		throw new Error("Method not implemented.");
+	}
+	visitUnary(expr: BinaryExpr): string {
+		throw new Error("Method not implemented.");
+	}
+	visitBinary(expr: BinaryExpr): string {
+		throw new Error("Method not implemented.");
+	}
+	visitAssignExpr(expr: AssignExpr): string {
+		throw new Error("Method not implemented.");
+	}
+	visitLiterature(tok: LiTToken): string {
+		throw new Error("Method not implemented.");
+	}
+	visitIfElseExpr(ifElse: IfElseExpr): string {
+		throw new Error("Method not implemented.");
+	}
+	reset(): void {
+		throw new Error("Method not implemented.");
+	}
+	visitFunction(f: FunctionDecl): string {
+		throw new Error("Method not implemented.");
+	}
+}
+export {};

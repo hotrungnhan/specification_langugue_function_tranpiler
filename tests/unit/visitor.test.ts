@@ -25,7 +25,7 @@ describe("visitor test", function () {
 		let f = new FunctionDecl(
 			"HelloWorld",
 			[],
-			[],
+			undefined,
 			undefined,
 			new VariableIdentifier("kq", DataType.B)
 		);
@@ -41,7 +41,7 @@ describe("visitor test", function () {
 				new VariableIdentifier("p1", DataType.Z_STAR),
 				new VariableIdentifier("p2", DataType.CHAR_STAR)
 			],
-			[],
+			undefined,
 			undefined,
 			new VariableIdentifier("kq", DataType.B)
 		);
@@ -57,7 +57,7 @@ describe("visitor test", function () {
 				new VariableIdentifier("p1", DataType.Z_STAR),
 				new VariableIdentifier("p2", DataType.CHAR_STAR)
 			],
-			[new AssignExpr(new VariableIdentifier("p1", DataType.Z_STAR))],
+			new AssignExpr(new VariableIdentifier("p1", DataType.Z_STAR)),
 			undefined,
 			new VariableIdentifier("kq", DataType.B)
 		);
@@ -74,19 +74,18 @@ describe("visitor test", function () {
 				new VariableIdentifier("p1", DataType.Z_STAR),
 				new VariableIdentifier("p2", DataType.CHAR_STAR)
 			],
-			[
-				new LoopExpr(
-					LoopType.VM,
-					new LiTToken(0, LitKind.IntLit),
+
+			new LoopExpr(
+				LoopType.VM,
+				new LiTToken(0, LitKind.IntLit),
+				new LiTToken(5, LitKind.IntLit),
+				new VariableIdentifier("i", DataType.N),
+				new BinaryExpr(
+					new Token(Operator.AND),
 					new LiTToken(5, LitKind.IntLit),
-					new VariableIdentifier("i", DataType.N),
-					new BinaryExpr(
-						new Token(Operator.AND),
-						new LiTToken(5, LitKind.IntLit),
-						new LiTToken(5, LitKind.IntLit)
-					)
+					new LiTToken(5, LitKind.IntLit)
 				)
-			],
+			),
 			undefined,
 			new VariableIdentifier("kq", DataType.B)
 		);

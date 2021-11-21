@@ -17,7 +17,6 @@ import {
 	UnaryExpr
 } from "@tranpiler/expr";
 import { FunctionDecl, VariableIdentifier } from "@tranpiler/expr";
-import { inspect } from "util";
 
 export class Parser {
 	index: number = 0;
@@ -26,7 +25,11 @@ export class Parser {
 	next() {
 		return this.tokens[++this.index];
 	}
-
+	reset() {
+		this.index = 0;
+		this.expr = [];
+		this.tokens = [];
+	}
 	private get peek() {
 		return this.tokens[this.index + 1];
 	}
@@ -179,7 +182,6 @@ export class Parser {
 		let exprs: Operand | undefined;
 		let ast: Operand | undefined = this.genASTTree(tokens);
 		let cur: Expr | undefined;
-		console.log("post ast", inspect(ast, false, 5, true));
 
 		//type 1
 		while (ast instanceof BinaryExpr && ast.Type == Operator.OR) {

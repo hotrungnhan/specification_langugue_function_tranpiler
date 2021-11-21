@@ -3,6 +3,7 @@ import Modal, { Styles } from "react-modal";
 import { FaInfoCircle } from "react-icons/fa";
 import Editor, { useMonaco } from "@monaco-editor/react";
 import { specsTokenizer } from "@web/monaco-spec";
+import { SpecTranpiler } from "@tranpiler/index";
 const editorOptions = { minimap: { enabled: false } };
 Modal.setAppElement("#root");
 const modelType: Styles = {
@@ -24,10 +25,12 @@ function App() {
 	const [language, setLanguage] = useState("javascript");
 	const [credit, setCredit] = useState(0);
 	const [src, setSrc] = useState("");
+	const [specSrc, setSpecSrc] = useState("");
 	const [stdin, setStdin] = useState("");
 	const [output, setOutput] = useState("");
 	const [errorMessage, setErrorMessage] = useState("");
 	const monaco = useMonaco();
+	const tranpiler = new SpecTranpiler();
 	const isModalOpen = useMemo(() => {
 		if (typeof errorMessage === "string") return errorMessage.trim() !== "";
 		else return false;
@@ -64,6 +67,18 @@ function App() {
 				} else setErrorMessage(err.message);
 			});
 	}, []); // [] as 2nd parameter is componentDidmount
+	function tranpile() {
+		const rs = tranpiler.convert(specSrc);
+		console.log(rs);
+		setSrc(rs);
+	}
+	function changeLanguage(event: React.ChangeEvent<HTMLSelectElement>) {
+		setLanguage(event.target.value);
+		console.log(event.target.value.toLowerCase());
+		tranpiler.setVisitor(
+			event.target.value.toLowerCase() as "python" | "javascript" | "js" | "py"
+		);
+	}
 	function executeCode() {
 		let lang = languageMap[language.toLocaleLowerCase() as TLanguage];
 		if (src.trim() == "") {
@@ -115,12 +130,19 @@ function App() {
 						className="rounded-md"
 						loading={<h1 className="text-white">loading...</h1>}
 						language="specs"
+						value={specSrc}
+						onChange={(newsrc) =>
+							newsrc ? setSpecSrc(newsrc) : setSpecSrc("")
+						}
 						options={editorOptions}
 					/>
 				</div>
 
 				<div className=" flex flex-col px-4 gap-4 my-auto">
-					<button className="btn border-blue-100 border-2 bg-green-400 my-auto text-white ">
+					<button
+						className="btn border-blue-100 border-2 bg-green-400 my-auto text-white "
+						onClick={tranpile}
+					>
 						Tranpiler
 					</button>
 					<button
@@ -132,7 +154,7 @@ function App() {
 					<select
 						value={language}
 						className="rounded-md p-2 text-center"
-						onChange={(event) => setLanguage(event.target.value)}
+						onChange={changeLanguage}
 					>
 						<option value="Javascript">Javascript</option>
 						<option value="Python">Python</option>

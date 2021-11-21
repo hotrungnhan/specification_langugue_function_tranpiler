@@ -9,5 +9,6 @@ export interface FunctionVisitor {
 	visitAssignExpr(expr: AssignExpr): string;
 	visitLiterature(tok: LiTToken): string;
 	visitIfElseExpr(ifElse: IfElseExpr): string;
+	reset(): void;
 	// visitForLoop(AST: ForloopExpr): string;
 }

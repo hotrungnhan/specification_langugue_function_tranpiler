@@ -19,6 +19,7 @@ import {
 } from "@tranpiler/token";
 import { Scanner } from "@tranpiler/scanner";
 import { Parser } from "@tranpiler/parser";
+import { SpecTranpiler } from "@tranpiler/index";
 
 let js = new JavascriptFunctionVisitor();
 describe("Tranpiler test", function () {
@@ -27,16 +28,9 @@ describe("Tranpiler test", function () {
         pre a != 0
         post (x = 5 && x=10)|| (x = 5 && x = 20)
         `;
-		let scaner = new Scanner(src);
-		scaner.scan();
-		console.log(scaner.Token);
-		let parser = new Parser().parse(scaner.Token);
-		console.log(parser);
-
-		let js = new JavascriptFunctionVisitor().visitFunction(
-			parser as FunctionDecl
-		);
-		console.log(js);
+		const tp = new SpecTranpiler();
+		console.log(tp.convert(src));
+		expect("").to.be.equal([]);
 	});
 });
 export {};
