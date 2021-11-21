@@ -4,8 +4,8 @@ Top Down
 - ![30%](https://progress-bar.dev/30) # Visitor py
 - ![90%](https://progress-bar.dev/90) # Visitor js
 - ![90%](https://progress-bar.dev/90) # Function Declare
-- ![85%](https://progress-bar.dev/85) # Expression Parser
-- ![30%](https://progress-bar.dev/30) # Expression Tree Builder && Token Parser
+- ![85%](https://progress-bar.dev/95) # Expression Parser
+- ![80%](https://progress-bar.dev/80) # Expression Tree Builder && Token Parser
 - ![100%](https://progress-bar.dev/100) # Scanner
 - ![100%](https://progress-bar.dev/100) # Token List
 
