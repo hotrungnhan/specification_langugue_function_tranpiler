@@ -5,10 +5,10 @@
     "lib": [
       "DOM",
       "DOM.Iterable",
-      "ESNext"
+      "ES2021"
     ],
     "useDefineForClassFields": true,
-    "target": "ESNext",
+    "target": "ES2021",
     "module": "commonjs",
     "rootDir": ".",
     "moduleResolution": "node",
@@ -39,5 +39,6 @@
     "tranpiler/**/*",
     "tests/**/*",
     "web/**/*",
+    "./index.ts"
   ],
 }

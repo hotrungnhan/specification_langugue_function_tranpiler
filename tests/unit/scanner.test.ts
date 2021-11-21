@@ -95,4 +95,39 @@ describe("scanner test", function () {
 		];
 		expect(scanner.Token).to.be.deep.equal(kq);
 	});
+	it("more complex", () => {
+		let scanner = new Scanner(
+			"Ham (a:R*, n:Z*)kq:B\npre a>0\npost a=23 && a=24"
+		);
+		scanner.scan();
+		let kq = [
+			new LiTToken("Ham", LitKind.StringLit),
+			new Token(Delemiter.LPRAREN),
+			new LiTToken("a", LitKind.StringLit),
+			new Token(Delemiter.COLON),
+			new Token(DataType.R_STAR),
+			new Token(Delemiter.COMMA),
+			new LiTToken("n", LitKind.StringLit),
+			new Token(Delemiter.COLON),
+			new Token(DataType.Z_STAR),
+			new Token(Delemiter.RPRAREN),
+			new LiTToken("kq", LitKind.StringLit),
+			new Token(Delemiter.COLON),
+			new Token(DataType.B),
+			new Token(Keyword.PRE),
+			new LiTToken("a", LitKind.StringLit),
+			new Token(Operator.GREATER),
+			new LiTToken(0, LitKind.IntLit),
+			new Token(Keyword.POST),
+			new LiTToken("a", LitKind.StringLit),
+			new Token(Operator.EQUALS),
+			new LiTToken(23, LitKind.IntLit),
+			new Token(Operator.AND),
+			new LiTToken("a", LitKind.StringLit),
+			new Token(Operator.EQUALS),
+			new LiTToken(24, LitKind.IntLit),
+			new Token(Basic.EOF)
+		];
+		expect(scanner.Token).to.be.deep.equal(kq);
+	});
 });

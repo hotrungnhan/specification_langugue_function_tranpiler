@@ -115,9 +115,13 @@ export class Scanner {
 						s = "";
 						continue;
 				}
-				this.token.push(new LiTToken(s, LitKind.StringLit));
+				this.token.push(new LiTToken(s, LitKind.Unknown));
 				s = "";
 				continue;
+			} else if (s.length > 2 && s.startsWith('"') && s.endsWith('"')) {
+				console.log(s);
+				this.token.push(new LiTToken(s.replaceAll('"', ""), LitKind.StringLit));
+				s = "";
 			} else if (
 				(s.length > 0 && isNum(s[0]) && isDot(c)) ||
 				(s.length > 0 && isAlphabet(s[0]) && isStar(c))
@@ -203,7 +207,7 @@ export class Scanner {
 					this.token.push(new Token(Operator.LESSER_EQUAL));
 					s = "";
 					continue;
-				case "!":
+				case "/":
 					this.token.push(new Token(Operator.SLASH));
 					s = "";
 					continue;

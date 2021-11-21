@@ -11,9 +11,8 @@ import {
 } from "@tranpiler/token";
 import { FunctionVisitor } from "@tranpiler/visitor";
 import { VariableContext } from "./context";
-type Operand = LiTToken | Expr | VariableIdentifier;
+export type Operand = LiTToken | Expr | VariableIdentifier;
 export abstract class Expr {
-	parent: Expr | null = null;
 	static Parser(list: Array<Token>) {}
 	OperandParser(value: Operand | undefined, visitor: FunctionVisitor): string {
 		if (value instanceof MathExpr) {
@@ -32,8 +31,11 @@ export abstract class MathExpr extends Expr {
 		super();
 		this.token = token;
 	}
-	get type(): TokenT {
+	get Type(): TokenT {
 		return this.token.Type;
+	}
+	set Type(t: TokenT) {
+		this.token.Type = t;
 	}
 }
 export abstract class KeywordExpr extends Expr {}
@@ -123,6 +125,9 @@ export class IfElseExpr extends KeywordExpr {
 	get Wrong() {
 		return this.wrong;
 	}
+	set Wrong(e: Expr | undefined) {
+		this.wrong = e;
+	}
 }
 export class LoopExpr extends KeywordExpr {
 	private from: Operand;
@@ -178,10 +183,13 @@ export class LoopExpr extends KeywordExpr {
 }
 export class VariableIdentifier {
 	private name: string;
-	private type: DataType;
-	constructor(name: string, type: DataType) {
+	private type?: DataType;
+	constructor(name: string, type?: DataType) {
 		this.name = name;
 		this.type = type;
+	}
+	static fromLitoken(tok: LiTToken) {
+		return new VariableIdentifier(tok.Value, undefined);
 	}
 	Equal(cpr: VariableIdentifier) {
 		return cpr.name == this.name;
@@ -195,21 +203,21 @@ export class VariableIdentifier {
 	set Name(x: string) {
 		this.name = x;
 	}
-	set Type(x: DataType) {
+	set Type(x: DataType | undefined) {
 		this.type = x;
 	}
 }
 export class FunctionDecl extends Expr {
 	functionName: string;
 	Parameter: Array<VariableIdentifier> = [];
-	Post: Array<Expr>;
+	Post?: Operand;
 	Return?: VariableIdentifier;
-	Pre?: MathExpr;
+	Pre?: Operand;
 	constructor(
 		functionName: string,
 		Parameter: Array<VariableIdentifier>,
-		Post: Array<Expr> = [],
-		Pre?: MathExpr,
+		Post?: Operand,
+		Pre?: Operand,
 		Return?: VariableIdentifier
 	) {
 		super();

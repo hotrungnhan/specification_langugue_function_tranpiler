@@ -9,7 +9,6 @@ import {
 	Expr,
 	LoopExpr
 } from "@tranpiler/expr";
-import util from "util";
 import {
 	Token,
 	Operator,

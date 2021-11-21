@@ -1,6 +1,6 @@
 import { Operator, LitKind, LoopType } from "@tranpiler/token";
 import { LiTToken, ValueToken } from "@tranpiler/token";
-import { FunctionDecl } from "@tranpiler/function";
+import { FunctionDecl, MathExpr, Operand } from "@tranpiler/expr";
 import {
 	BinaryExpr,
 	UnaryExpr,
@@ -40,12 +40,17 @@ export class JavascriptFunctionVisitor
 		}
 		if (f.Pre) {
 			output += this.visitExpr(
-				new IfElseExpr(f.Pre, new CommandExpr("Return"))
+				new IfElseExpr(f.Pre as MathExpr, new CommandExpr("Return"))
 			);
 		}
-		f.Post.forEach((post) => {
-			output += this.visitExpr(post);
-		});
+		if (f.Post) {
+			output += this.visitExpr(f.Post);
+		}
+		if (f.Return) {
+			output += this.genCommand(
+				this.visitCommandExpr(new CommandExpr(`return ${f.Return.Name}`))
+			);
+		}
 		output += "}";
 		this.reset();
 		return output;
@@ -70,14 +75,14 @@ export class JavascriptFunctionVisitor
 	visitLiterature(tok: LiTToken): string {
 		switch (tok.Kind) {
 			case LitKind.FloatLit:
+			case LitKind.Unknown:
 			case LitKind.IntLit:
 				return tok.Value;
 			case LitKind.StringLit:
 				return `"${tok.Value}"`;
 		}
-		return "";
 	}
-	visitExpr(e: Expr): string {
+	visitExpr(e: Operand): string {
 		if (e instanceof UnaryExpr) {
 			return this.visitUnary(e);
 		}
@@ -96,20 +101,23 @@ export class JavascriptFunctionVisitor
 		if (e instanceof CommandExpr) {
 			return this.visitCommandExpr(e);
 		}
+		if (e instanceof LiTToken) {
+			return this.visitLiterature(e);
+		}
 		return "";
 	}
 	visitCommandExpr(cm: CommandExpr) {
 		return cm.Command;
 	}
 	visitUnary(expr: UnaryExpr): string {
-		switch (expr.type) {
+		switch (expr.Type) {
 			case Operator.NOT:
 				return `!${expr.valueRight(this)}`;
 		}
 		return "";
 	}
 	visitBinary(expr: BinaryExpr): string {
-		switch (expr.type) {
+		switch (expr.Type) {
 			// case Operator.ASSIGN:
 			// return `(${expr.visitLeft(this)} = ${expr.visitRight(this)})`;
 			case Operator.PLUS:

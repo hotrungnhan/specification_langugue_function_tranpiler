@@ -7,22 +7,22 @@ import {
 	DataType,
 	Keyword
 } from "@tranpiler/token";
-import { BinaryExpr, Expr, MathExpr, UnaryExpr } from "@tranpiler/expr";
+import {
+	AssignExpr,
+	BinaryExpr,
+	Expr,
+	IfElseExpr,
+	MathExpr,
+	Operand,
+	UnaryExpr
+} from "@tranpiler/expr";
 import { FunctionDecl, VariableIdentifier } from "@tranpiler/expr";
+import { inspect } from "util";
 
 export class Parser {
-	static inst: Parser | null;
 	index: number = 0;
 	expr: Array<Expr> = [];
 	tokens: Array<Token> = [];
-	static get Inst() {
-		if (!this.inst) {
-			Parser.inst = new Parser();
-			return Parser.inst as Parser;
-		} else {
-			return Parser.inst as Parser;
-		}
-	}
 	next() {
 		return this.tokens[++this.index];
 	}
@@ -35,12 +35,7 @@ export class Parser {
 	}
 	parse(tokens: Array<Token>) {
 		this.tokens = tokens;
-		while (this.current && this.current.Type != Basic.EOF) {
-			let t = this.statements();
-			if (t) this.expr.push(t);
-			this.next();
-		}
-		return this.expr;
+		return this.statements();
 	}
 	statements() {
 		if (
@@ -54,86 +49,177 @@ export class Parser {
 		const cur = this.current as LiTToken;
 		const fname = cur.Value;
 		const parameter = [];
-		let pre: MathExpr | undefined = undefined;
-		let post: Array<Expr> = [];
+
 		// const return :
 		this.next(); // get (
 		// scan parameter ;
-		while (this.current && this.current.Type != Delemiter.RPRAREN) {
+		if (this.peek.Type != Delemiter.RPRAREN) {
+			while (this.current && this.current.Type != Delemiter.RPRAREN) {
+				let parname = (this.next() as LiTToken).Value;
+				this.next(); // skip to type
+				let partype = this.next().Type;
+				parameter.push(new VariableIdentifier(parname, partype as DataType));
+				if (this.next().Type == Delemiter.RPRAREN) {
+					continue; //continue to break;
+				}
+			}
+		} else {
+			this.next();
+		}
+
+		let retur: VariableIdentifier | undefined = undefined;
+
+		if (this.peek.Type != Keyword.PRE) {
+			// scan return ;
 			let parname = (this.next() as LiTToken).Value;
 			this.next(); // skip to type
 			let partype = this.next().Type;
-			parameter.push(new VariableIdentifier(parname, partype as DataType));
-			if (this.next().Type == Delemiter.RPRAREN) {
-				continue; //continue to break;
-			}
+			retur = new VariableIdentifier(parname, partype as DataType);
 		}
-		// scan return ;
-		let parname = (this.next() as LiTToken).Value;
-		this.next(); // skip to type
-		let partype = this.next().Type;
-		let retur = new VariableIdentifier(parname, partype as DataType);
-		if (this.next().Type == Keyword.PRE) {
-			pre = this.parsePreExpr();
-		} // skip to type
-		if (this.next().Type == Keyword.POST) {
-			post = this.parsePostExpr();
-		}
+		const preidx = this.tokens.findIndex((value) => {
+			return value.Type == Keyword.PRE;
+		});
+		const postidx = this.tokens.findIndex((value) => {
+			return value.Type == Keyword.POST;
+		});
+		const eofidx = this.tokens.findIndex((value) => {
+			return value.Type == Basic.EOF;
+		});
+
+		let pretok = this.tokens.slice(preidx + 1, postidx);
+		let pre: MathExpr | undefined = this.parsePreExpr(pretok);
+		console.log("pre", pre);
+		let posttok = this.tokens.slice(postidx + 1, eofidx);
+		let post = this.parsePostExpr(posttok);
+		console.log("post", posttok);
 		return new FunctionDecl(fname, parameter, post, pre, retur);
 	}
-	parsePreExpr(): MathExpr {
-		let prev: Token = this.next();
-		let Expr: MathExpr | null = null;
-		let currentexpr: MathExpr | null = null;
-		console.log(this.current);
-		while (this.current && this.current.Type != Keyword.POST) {
-			console.log(this.current);
-			if (prev.Type == Basic.LITERAL) {
-				prev = this.next();
-			} else {
-				switch (this.current.Type) {
-					case Operator.PLUS:
-					case Operator.MINUS:
-					case Operator.STAR:
-					case Operator.SLASH:
-					case Operator.PERCENT:
-					case Operator.GREATER:
-					case Operator.LESSER:
-					case Operator.EQUALS:
-					case Operator.NOT_EQUAL:
-					case Operator.GREATER_EQUAL:
-					case Operator.LESSER_EQUAL:
-					case Operator.OR:
-						if (
-							currentexpr instanceof BinaryExpr ||
-							currentexpr instanceof UnaryExpr
-						) {
-							currentexpr.right = new BinaryExpr(
-								this.current,
-								prev as LiTToken,
-								this.next() as LiTToken
-							);
-							currentexpr = currentexpr.right as MathExpr;
-						}
-						break;
-					case Operator.NOT:
-						if (
-							currentexpr instanceof BinaryExpr ||
-							currentexpr instanceof UnaryExpr
-						) {
-							currentexpr.right = new UnaryExpr(
-								this.current,
-								this.next() as LiTToken
-							);
-							currentexpr = currentexpr.right as MathExpr;
-						}
-						break;
-				}
+	parsePreExpr(tokens: Token[]): MathExpr | undefined {
+		return this.genASTTree(tokens);
+	}
+	genASTTree(tokens: Token[]): MathExpr | undefined {
+		const RPN = this.genRPN(tokens) as Operand[];
+		//RPN Shunting-yard algorithm from  https://en.wikipedia.org/wiki/Shunting-yard_algorithm :)) đọc mệt quá =(())
+		let temp: Operand[] = new Array(0);
+		while (RPN.length > 0) {
+			const token = RPN.shift() as Token;
+			switch (token.Type) {
+				case Basic.LITERAL:
+					temp.push(token as LiTToken);
+					break;
+				case Operator.PLUS:
+				case Operator.MINUS:
+				case Operator.STAR:
+				case Operator.SLASH:
+				case Operator.PERCENT:
+				case Operator.GREATER:
+				case Operator.LESSER:
+				case Operator.EQUALS:
+				case Operator.NOT_EQUAL:
+				case Operator.GREATER_EQUAL:
+				case Operator.LESSER_EQUAL:
+				case Operator.AND:
+				case Operator.OR:
+					let right = temp.pop() as LiTToken | Expr;
+					let left = temp.pop() as LiTToken | Expr;
+					temp.push(new BinaryExpr(token, left, right));
+					break;
+				case Operator.NOT:
+					temp.push(new UnaryExpr(token, temp.pop() as LiTToken | Expr));
+					break;
 			}
 		}
-		return Expr as unknown as MathExpr;
+		return temp.pop() as MathExpr | undefined;
 	}
-	parsePostExpr(): Expr[] {
-		return [];
+	genRPN(token: Token[]) {
+		const operatorStack: Token[] = [];
+		const OutputStack: Token[] = [];
+		token.forEach((token) => {
+			switch (token.Type) {
+				case Basic.LITERAL:
+					OutputStack.push(token);
+					break;
+				case Operator.PLUS:
+				case Operator.MINUS:
+				case Operator.STAR:
+				case Operator.SLASH:
+				case Operator.PERCENT:
+				case Operator.GREATER:
+				case Operator.LESSER:
+				case Operator.EQUALS:
+				case Operator.NOT_EQUAL:
+				case Operator.GREATER_EQUAL:
+				case Operator.LESSER_EQUAL:
+				case Operator.AND:
+				case Operator.OR:
+					operatorStack.push(token);
+					break;
+				case Delemiter.LPRAREN:
+					operatorStack.push(token);
+					break;
+				case Delemiter.RPRAREN:
+					let t: Token | undefined;
+					while (true) {
+						t = operatorStack.pop();
+						if (t && (t as Token).Type != Delemiter.LPRAREN) {
+							OutputStack.push(t as Token);
+						} else {
+							break;
+						}
+					}
+					break;
+			}
+		});
+		while (operatorStack.length > 0) {
+			OutputStack.push(operatorStack.pop() as Token);
+		}
+		return OutputStack;
+	}
+	parsePostExpr(tokens: Token[]): Operand | undefined {
+		let exprs: Operand | undefined;
+		let ast: Operand | undefined = this.genASTTree(tokens);
+		let cur: Expr | undefined;
+		console.log("post ast", inspect(ast, false, 5, true));
+
+		//type 1
+		while (ast instanceof BinaryExpr && ast.Type == Operator.OR) {
+			if (ast.left instanceof BinaryExpr) {
+				if (ast.left.Type == Operator.EQUALS) {
+					let t = VariableIdentifier.fromLitoken(ast.left.left as LiTToken);
+					let assign = new AssignExpr(t, ast.left.right);
+					let newif = new IfElseExpr(ast.right as MathExpr, assign);
+
+					if (cur instanceof IfElseExpr) {
+						cur.Wrong = assign;
+						cur = cur.Wrong;
+					} else {
+						exprs = cur = newif;
+					}
+					ast = ast.right;
+				} else if (
+					ast.left.Type == Operator.AND &&
+					ast.left.left instanceof BinaryExpr
+				) {
+					let t = VariableIdentifier.fromLitoken(
+						ast.left.left.left as LiTToken
+					);
+					let assign = new AssignExpr(t, ast.left.left.right);
+					let newif = new IfElseExpr(ast.left.right as MathExpr, assign);
+					if (cur instanceof IfElseExpr) {
+						cur.Wrong = newif;
+						cur = cur.Wrong;
+					} else {
+						exprs = cur = newif;
+					}
+					ast = ast.right;
+				} else {
+					break;
+				}
+			} else {
+				break;
+			}
+		}
+		//type 2 no idea
+		return exprs ? exprs : ast;
 	}
 }

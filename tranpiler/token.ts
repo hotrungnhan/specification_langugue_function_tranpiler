@@ -1,7 +1,8 @@
 export enum LitKind {
 	IntLit = "int",
 	FloatLit = "float",
-	StringLit = "string"
+	StringLit = "string",
+	Unknown = "unknown"
 }
 export type TokenT =
 	| Basic
@@ -81,6 +82,9 @@ export class Token {
 	}
 	get Type() {
 		return this.type;
+	}
+	set Type(t: TokenT) {
+		this.type = t;
 	}
 }
 export abstract class ValueToken extends Token {

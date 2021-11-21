@@ -1,4 +1,4 @@
-import { VariableIdentifier } from "./function";
+import { VariableIdentifier } from "@tranpiler/expr";
 
 export class VariableContext {
 	variable: Array<VariableIdentifier> = [];

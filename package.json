@@ -6,7 +6,8 @@
 	"homepage": ".",
 	"scripts": {
 		"tran:build": "tsc",
-		"tran:test": "mocha  -r tsconfig-paths/register -r ts-node/register tests/**/*.ts",
+		"tran:test": "yarn tran:testf tests/**/*.ts",
+		"tran:testf": "mocha  -r tsconfig-paths/register -r ts-node/register",
 		"dev": "vite",
 		"build": "tsc && vite build",
 		"preview": "vite preview"
