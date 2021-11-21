@@ -120,7 +120,20 @@ function App() {
 					Close
 				</button>
 			</Modal>
-			<div className="p-4 inline-flex justify-between w-full mt-4 ">
+			<div className="px-4 pt-4 ">
+				<h1 className=" text-red-400 text-xl">Notice:</h1>
+				<ul className=" text-white 400 text-sm">
+					<li>
+						* Due to using jdoodle api, we only have 200 used credit per day (
+						one per executed)
+					</li>
+					<li>
+						* There might be a function cant work as expected, just forget it
+						&#9829;
+					</li>
+				</ul>
+			</div>
+			<div className="px-4 pb-4 inline-flex justify-between w-full mt-4 ">
 				<div className="w-19/40 h-96">
 					<h1 className="text-xl text-white mb-4 pl-2">Ngôn ngữ đặc tả</h1>
 					<Editor

@@ -2,9 +2,6 @@ import axios, { AxiosResponse } from "axios";
 axios.defaults.baseURL =
 	"https://cors-anywhere-self-host.herokuapp.com/" + "https://api.jdoodle.com/v1";
 axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
-axios.interceptors.response.use((value) => {
-	value.status = 403;
-});
 interface AuthBody {
 	clientId: string;
 	clientSecret: string;
