@@ -67,6 +67,48 @@ export enum Operator {
 	AND = "&&", // &&
 	OR = "||" // ||
 }
+export enum Associated {
+	LEFT,
+	RIGHT
+}
+export function getPrecedence(op: Operator) {
+	// https://i.stack.imgur.com/XgKf8.png
+	// smaller is more precedence
+	switch (op) {
+		case Operator.STAR:
+		case Operator.MINUS:
+		case Operator.SLASH:
+		case Operator.PERCENT:
+			return 5;
+		case Operator.PLUS:
+		case Operator.MINUS:
+			return 6;
+
+		case Operator.GREATER:
+		case Operator.LESSER:
+		case Operator.EQUALS:
+		case Operator.GREATER_EQUAL:
+		case Operator.LESSER_EQUAL:
+			return 8;
+		case Operator.NOT_EQUAL:
+			return 9;
+		case Operator.NOT:
+		case Operator.AND:
+			return 13;
+		case Operator.OR:
+			return 14;
+		default:
+			return 1000;
+	}
+}
+export function getAssociated(op: Operator) {
+	if (op == Operator.NOT) {
+		return Associated.RIGHT;
+	} else {
+		return Associated.LEFT;
+	}
+}
+
 export const keywordArray: string[] = [
 	...(Object.values(DataType) as string[]),
 	...(Object.values(LoopType) as string[]),

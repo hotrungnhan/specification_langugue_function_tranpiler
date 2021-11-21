@@ -57,20 +57,20 @@ function App() {
 				setCredit(res.data.used);
 			})
 			.catch((err) => {
-				console.log(err);
 				if (err.response && err.response.error) {
-					console.log(err.response);
 					setErrorMessage(err.response.error);
 				} else if (err.response) {
-					console.log(err.response);
 					setErrorMessage(err.response);
 				} else setErrorMessage(err.message);
 			});
 	}, []); // [] as 2nd parameter is componentDidmount
 	function tranpile() {
-		const rs = tranpiler.convert(specSrc);
-		console.log(rs);
-		setSrc(rs);
+		try {
+			const rs = tranpiler.convert(specSrc);
+			setSrc(rs);
+		} catch (err) {
+			setErrorMessage(err as string);
+		}
 	}
 	function changeLanguage(event: React.ChangeEvent<HTMLSelectElement>) {
 		setLanguage(event.target.value);

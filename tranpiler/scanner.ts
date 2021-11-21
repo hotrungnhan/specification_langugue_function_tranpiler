@@ -111,7 +111,6 @@ export class Scanner {
 				s = "";
 				continue;
 			} else if (s.length > 2 && s.startsWith('"') && s.endsWith('"')) {
-				console.log(s);
 				tokens.push(new LiTToken(s.replaceAll('"', ""), LitKind.StringLit));
 				s = "";
 			} else if (

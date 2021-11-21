@@ -3,6 +3,7 @@ import { Scanner } from "@tranpiler/scanner";
 import type { FunctionVisitor } from "@tranpiler/visitor";
 import { JavascriptFunctionVisitor } from "@tranpiler/visitor/jsvisitor";
 import { PythonFunctionVisitor } from "@tranpiler/visitor/pyvisitor";
+
 export class SpecTranpiler {
 	private visitor: FunctionVisitor;
 	private src: string;

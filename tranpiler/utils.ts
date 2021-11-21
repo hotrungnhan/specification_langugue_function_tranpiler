@@ -24,4 +24,5 @@ function isStar(x: string) {
 	return x == "*";
 }
 
+
 export { isStar, isAlphabet, isNum, isInt, isFloat, isDot, isBlank, isSign };

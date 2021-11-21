@@ -5,7 +5,10 @@ import {
 	LiTToken,
 	Operator,
 	DataType,
-	Keyword
+	Keyword,
+	getAssociated,
+	Associated,
+	getPrecedence
 } from "@tranpiler/token";
 import {
 	AssignExpr,
@@ -91,10 +94,8 @@ export class Parser {
 
 		let pretok = this.tokens.slice(preidx + 1, postidx);
 		let pre: MathExpr | undefined = this.parsePreExpr(pretok);
-		console.log("pre", pre);
 		let posttok = this.tokens.slice(postidx + 1, eofidx);
 		let post = this.parsePostExpr(posttok);
-		console.log("post", posttok);
 		return new FunctionDecl(fname, parameter, post, pre, retur);
 	}
 	parsePreExpr(tokens: Token[]): MathExpr | undefined {
@@ -103,6 +104,8 @@ export class Parser {
 	genASTTree(tokens: Token[]): MathExpr | undefined {
 		const RPN = this.genRPN(tokens) as Operand[];
 		//RPN Shunting-yard algorithm from  https://en.wikipedia.org/wiki/Shunting-yard_algorithm :)) đọc mệt quá =(())
+		// https://aquarchitect.github.io/swift-algorithm-club/Shunting%20Yard/
+
 		let temp: Operand[] = new Array(0);
 		while (RPN.length > 0) {
 			const token = RPN.shift() as Token;
@@ -136,11 +139,11 @@ export class Parser {
 	}
 	genRPN(token: Token[]) {
 		const operatorStack: Token[] = [];
-		const OutputStack: Token[] = [];
+		const outputStack: Token[] = [];
 		token.forEach((token) => {
 			switch (token.Type) {
 				case Basic.LITERAL:
-					OutputStack.push(token);
+					outputStack.push(token);
 					break;
 				case Operator.PLUS:
 				case Operator.MINUS:
@@ -155,6 +158,19 @@ export class Parser {
 				case Operator.LESSER_EQUAL:
 				case Operator.AND:
 				case Operator.OR:
+					let top = operatorStack[operatorStack.length - 1]; // peek
+					if (
+						(top &&
+							getAssociated(token.Type) == Associated.LEFT &&
+							getPrecedence(token.Type) >=
+								getPrecedence(top.Type as Operator)) ||
+						(top &&
+							getAssociated(token.Type) == Associated.RIGHT &&
+							getPrecedence(token.Type) > getPrecedence(top?.Type as Operator))
+					) {
+						let y = operatorStack.pop();
+						outputStack.push(y as Token);
+					}
 					operatorStack.push(token);
 					break;
 				case Delemiter.LPRAREN:
@@ -165,7 +181,7 @@ export class Parser {
 					while (true) {
 						t = operatorStack.pop();
 						if (t && (t as Token).Type != Delemiter.LPRAREN) {
-							OutputStack.push(t as Token);
+							outputStack.push(t as Token);
 						} else {
 							break;
 						}
@@ -174,9 +190,10 @@ export class Parser {
 			}
 		});
 		while (operatorStack.length > 0) {
-			OutputStack.push(operatorStack.pop() as Token);
+			outputStack.push(operatorStack.pop() as Token);
 		}
-		return OutputStack;
+
+		return outputStack;
 	}
 	parsePostExpr(tokens: Token[]): Operand | undefined {
 		let exprs: Operand | undefined;
@@ -190,7 +207,6 @@ export class Parser {
 					let t = VariableIdentifier.fromLitoken(ast.left.left as LiTToken);
 					let assign = new AssignExpr(t, ast.left.right);
 					let newif = new IfElseExpr(ast.right as MathExpr, assign);
-
 					if (cur instanceof IfElseExpr) {
 						cur.Wrong = assign;
 						cur = cur.Wrong;

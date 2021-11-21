@@ -27,6 +27,7 @@ describe("parser test", function () {
 			new Token(Delemiter.RPRAREN)
 		];
 		let ast = new Parser().genRPN(kq);
+		
 		expect(ast).to.be.equal(false);
 	});
 	it("test pre parser", () => {
@@ -73,58 +74,58 @@ describe("parser test", function () {
 			new Token(Delemiter.RPRAREN),
 			new Token(Delemiter.RPRAREN)
 		];
-		let ast = new Parser().parsePreExpr(kq);
+		let ast = new Parser().genRPN(kq);
 		console.log(util.inspect(ast, false, 25, true /* enable colors */));
 		expect(ast).to.be.equal(false);
 	});
-	it("test post parser", () => {
-		let kq = [
-			new Token(Delemiter.LPRAREN),
-			new Token(Delemiter.LPRAREN),
-			new LiTToken("a", LitKind.StringLit),
-			new Token(Operator.EQUALS),
-			new LiTToken(3943, LitKind.IntLit),
-			new Token(Delemiter.RPRAREN),
-			new Token(Operator.AND),
-			new Token(Delemiter.LPRAREN),
-			new LiTToken("a", LitKind.StringLit),
-			new Token(Operator.EQUALS),
-			new LiTToken(3943, LitKind.IntLit),
-			new Token(Delemiter.RPRAREN),
-			new Token(Delemiter.RPRAREN),
-			new Token(Operator.OR),
-			new Token(Delemiter.LPRAREN),
-			new Token(Delemiter.LPRAREN),
-			new LiTToken("a", LitKind.StringLit),
-			new Token(Operator.EQUALS),
-			new LiTToken(3943, LitKind.IntLit),
-			new Token(Delemiter.RPRAREN),
-			new Token(Operator.AND),
-			new Token(Delemiter.LPRAREN),
-			new LiTToken("a", LitKind.StringLit),
-			new Token(Operator.EQUALS),
-			new LiTToken(3943, LitKind.IntLit),
-			new Token(Delemiter.RPRAREN),
-			new Token(Delemiter.RPRAREN),
-			new Token(Operator.OR),
-			new Token(Delemiter.LPRAREN),
-			new Token(Delemiter.LPRAREN),
-			new LiTToken("a", LitKind.StringLit),
-			new Token(Operator.EQUALS),
-			new LiTToken(3943, LitKind.IntLit),
-			new Token(Delemiter.RPRAREN),
-			new Token(Operator.AND),
-			new Token(Delemiter.LPRAREN),
-			new LiTToken("a", LitKind.StringLit),
-			new Token(Operator.EQUALS),
-			new LiTToken(3943, LitKind.IntLit),
-			new Token(Delemiter.RPRAREN),
-			new Token(Delemiter.RPRAREN)
-		];
-		let ast = new Parser().parsePostExpr(kq);
-		console.log(util.inspect(ast, false, 25, true /* enable colors */));
-		expect(ast).to.be.equal(false);
-	});
+	// it("test post parser", () => {
+	// 	let kq = [
+	// 		new Token(Delemiter.LPRAREN),
+	// 		new Token(Delemiter.LPRAREN),
+	// 		new LiTToken("a", LitKind.StringLit),
+	// 		new Token(Operator.EQUALS),
+	// 		new LiTToken(3943, LitKind.IntLit),
+	// 		new Token(Delemiter.RPRAREN),
+	// 		new Token(Operator.AND),
+	// 		new Token(Delemiter.LPRAREN),
+	// 		new LiTToken("a", LitKind.StringLit),
+	// 		new Token(Operator.EQUALS),
+	// 		new LiTToken(3943, LitKind.IntLit),
+	// 		new Token(Delemiter.RPRAREN),
+	// 		new Token(Delemiter.RPRAREN),
+	// 		new Token(Operator.OR),
+	// 		new Token(Delemiter.LPRAREN),
+	// 		new Token(Delemiter.LPRAREN),
+	// 		new LiTToken("a", LitKind.StringLit),
+	// 		new Token(Operator.EQUALS),
+	// 		new LiTToken(3943, LitKind.IntLit),
+	// 		new Token(Delemiter.RPRAREN),
+	// 		new Token(Operator.AND),
+	// 		new Token(Delemiter.LPRAREN),
+	// 		new LiTToken("a", LitKind.StringLit),
+	// 		new Token(Operator.EQUALS),
+	// 		new LiTToken(3943, LitKind.IntLit),
+	// 		new Token(Delemiter.RPRAREN),
+	// 		new Token(Delemiter.RPRAREN),
+	// 		new Token(Operator.OR),
+	// 		new Token(Delemiter.LPRAREN),
+	// 		new Token(Delemiter.LPRAREN),
+	// 		new LiTToken("a", LitKind.StringLit),
+	// 		new Token(Operator.EQUALS),
+	// 		new LiTToken(3943, LitKind.IntLit),
+	// 		new Token(Delemiter.RPRAREN),
+	// 		new Token(Operator.AND),
+	// 		new Token(Delemiter.LPRAREN),
+	// 		new LiTToken("a", LitKind.StringLit),
+	// 		new Token(Operator.EQUALS),
+	// 		new LiTToken(3943, LitKind.IntLit),
+	// 		new Token(Delemiter.RPRAREN),
+	// 		new Token(Delemiter.RPRAREN)
+	// 	];
+	// 	let ast = new Parser().parsePostExpr(kq);
+	// 	console.log(util.inspect(ast, false, 25, true /* enable colors */));
+	// 	expect(ast).to.be.equal(false);
+	// });
 	// it("sample 1", function () {
 	// 	let kq = [
 	// 		new LiTToken("Ham", LitKind.StringLit),
