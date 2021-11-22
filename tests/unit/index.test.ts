@@ -33,4 +33,17 @@ describe("Tranpiler test", function () {
 		expect("").to.be.equal([]);
 	});
 });
+describe("Tranpiler test 2 ", function () {
+	it("template 1 ", () => {
+		let src = `Max2SoDuong  (a1 :R , a2 : R) kq : R
+		pre (  (a1 > 0) && ( a2 >0)  )
+		post ( (kq = a1) && (a1 >=a2))
+			 ||((kq=a2)&&(a2>a1))
+		`;
+
+		const tp = new SpecTranpiler({ parser: true });
+		console.log(tp.convert(src));
+		expect("").to.be.equal([]);
+	});
+});
 export {};

@@ -36,7 +36,7 @@ describe("scanner test", function () {
 	});
 	it("number && token", () => {
 		let scanner = new Scanner();
-		let token = scanner.scan("2312   VM abcszy TT");
+		let token = scanner.scan('2312   VM "abcszy" TT');
 		let kq = [
 			new LiTToken(2312, LitKind.IntLit),
 			new Token(LoopType.VM),
@@ -50,17 +50,17 @@ describe("scanner test", function () {
 		let scanner = new Scanner();
 		let token = scanner.scan("Ham (a:R*, n:N)kq:B\npre\npost");
 		let kq = [
-			new LiTToken("Ham", LitKind.StringLit),
+			new LiTToken("Ham", LitKind.Unknown),
 			new Token(Delemiter.LPRAREN),
-			new LiTToken("a", LitKind.StringLit),
+			new LiTToken("a", LitKind.Unknown),
 			new Token(Delemiter.COLON),
 			new Token(DataType.R_STAR),
 			new Token(Delemiter.COMMA),
-			new LiTToken("n", LitKind.StringLit),
+			new LiTToken("n", LitKind.Unknown),
 			new Token(Delemiter.COLON),
 			new Token(DataType.N),
 			new Token(Delemiter.RPRAREN),
-			new LiTToken("kq", LitKind.StringLit),
+			new LiTToken("kq", LitKind.Unknown),
 			new Token(Delemiter.COLON),
 			new Token(DataType.B),
 			new Token(Keyword.PRE),
@@ -73,21 +73,21 @@ describe("scanner test", function () {
 		let scanner = new Scanner();
 		let token = scanner.scan("Ham (a:R*, n:N)kq:B\npre a>0\npost");
 		let kq = [
-			new LiTToken("Ham", LitKind.StringLit),
+			new LiTToken("Ham", LitKind.Unknown),
 			new Token(Delemiter.LPRAREN),
-			new LiTToken("a", LitKind.StringLit),
+			new LiTToken("a", LitKind.Unknown),
 			new Token(Delemiter.COLON),
 			new Token(DataType.R_STAR),
 			new Token(Delemiter.COMMA),
-			new LiTToken("n", LitKind.StringLit),
+			new LiTToken("n", LitKind.Unknown),
 			new Token(Delemiter.COLON),
 			new Token(DataType.N),
 			new Token(Delemiter.RPRAREN),
-			new LiTToken("kq", LitKind.StringLit),
+			new LiTToken("kq", LitKind.Unknown),
 			new Token(Delemiter.COLON),
 			new Token(DataType.B),
 			new Token(Keyword.PRE),
-			new LiTToken("a", LitKind.StringLit),
+			new LiTToken("a", LitKind.Unknown),
 			new Token(Operator.GREATER),
 			new LiTToken(0, LitKind.IntLit),
 			new Token(Keyword.POST),
@@ -95,35 +95,46 @@ describe("scanner test", function () {
 		];
 		expect(token).to.be.deep.equal(kq);
 	});
+	it("more more complex", () => {
+		let src = `kq >= a1   `;
+		let scanner = new Scanner().scan(src);
+		let kq = [
+			new LiTToken("kq", LitKind.Unknown),
+			new Token(Operator.GREATER_EQUAL),
+			new LiTToken("a1", LitKind.Unknown),
+			new Token(Basic.EOF)
+		];
+		expect(scanner).to.be.deep.equal(kq);
+	});
 	it("more complex", () => {
 		let scanner = new Scanner();
 		let token = scanner.scan(
 			"Ham (a:R*, n:Z*)kq:B\npre a>0\npost a=23 && a=24"
 		);
 		let kq = [
-			new LiTToken("Ham", LitKind.StringLit),
+			new LiTToken("Ham", LitKind.Unknown),
 			new Token(Delemiter.LPRAREN),
-			new LiTToken("a", LitKind.StringLit),
+			new LiTToken("a", LitKind.Unknown),
 			new Token(Delemiter.COLON),
 			new Token(DataType.R_STAR),
 			new Token(Delemiter.COMMA),
-			new LiTToken("n", LitKind.StringLit),
+			new LiTToken("n", LitKind.Unknown),
 			new Token(Delemiter.COLON),
 			new Token(DataType.Z_STAR),
 			new Token(Delemiter.RPRAREN),
-			new LiTToken("kq", LitKind.StringLit),
+			new LiTToken("kq", LitKind.Unknown),
 			new Token(Delemiter.COLON),
 			new Token(DataType.B),
 			new Token(Keyword.PRE),
-			new LiTToken("a", LitKind.StringLit),
+			new LiTToken("a", LitKind.Unknown),
 			new Token(Operator.GREATER),
 			new LiTToken(0, LitKind.IntLit),
 			new Token(Keyword.POST),
-			new LiTToken("a", LitKind.StringLit),
+			new LiTToken("a", LitKind.Unknown),
 			new Token(Operator.EQUALS),
 			new LiTToken(23, LitKind.IntLit),
 			new Token(Operator.AND),
-			new LiTToken("a", LitKind.StringLit),
+			new LiTToken("a", LitKind.Unknown),
 			new Token(Operator.EQUALS),
 			new LiTToken(24, LitKind.IntLit),
 			new Token(Basic.EOF)

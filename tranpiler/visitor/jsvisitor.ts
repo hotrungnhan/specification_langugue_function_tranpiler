@@ -149,19 +149,19 @@ export class JavascriptFunctionVisitor
 		}
 		return "";
 	}
-	visitIfElseExpr(ifElse: IfElseExpr): string {
+	visitIfElseExpr(ifElse: IfElseExpr, nested: boolean = false): string {
 		let ctx = "";
 		ctx +=
-			this.level.getSpaceByLevel() +
+			(nested ? "" : this.level.getSpaceByLevel()) +
 			`if ${this.visitExpr(ifElse.Condition)}{\n`;
 		this.level.incre();
 		ctx += this.genCommand(this.visitExpr(ifElse.Right));
 		if (ifElse.Wrong instanceof IfElseExpr) {
 			this.level.decre();
 			ctx += this.level.getSpaceByLevel() + `} else `;
-			ctx += this.visitIfElseExpr(ifElse.Wrong);
+			ctx += this.visitIfElseExpr(ifElse.Wrong, true);
 			// this.level.decre();
-			ctx += this.level.getSpaceByLevel() + "}\n";
+			// ctx += this.level.getSpaceByLevel() + "}\n";
 		} else if (ifElse.Wrong) {
 			this.level.decre();
 			ctx += this.level.getSpaceByLevel() + `} else {\n`;

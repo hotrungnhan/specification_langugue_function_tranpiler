@@ -204,6 +204,7 @@ export class Parser {
 			if (left instanceof IfElseExpr && right instanceof Expr) {
 				left.Wrong = right;
 			}
+			console.log("1", right);
 			return left;
 		} else if (ast instanceof BinaryExpr && ast.Type == Operator.EQUALS) {
 			const t = VariableIdentifier.fromLitoken(ast.left as LiTToken);
@@ -221,7 +222,6 @@ export class Parser {
 	parsePostExpr(tokens: Token[]): Operand | undefined {
 		let exprs: Operand | undefined;
 		let ast: Operand | undefined = this.genASTTree(tokens);
-
 		//type 1
 		exprs = this.genIfElse(ast);
 		//type 2 no idea

@@ -115,7 +115,12 @@ export class Scanner {
 				s = "";
 			} else if (
 				(s.length > 0 && isNum(s[0]) && isDot(c)) ||
-				(s.length > 0 && isAlphabet(s[0]) && isStar(c))
+				(s.length > 0 && isAlphabet(s[0]) && isStar(c)) ||
+				(s == "<" && peek == "=") ||
+				(s == ">" && peek == "=") ||
+				(s == "!" && peek == "=") ||
+				(s == "&" && peek == "&") ||
+				(s == "|" && peek == "|")
 			) {
 				// skip if current char is dot and start with number
 				continue;
