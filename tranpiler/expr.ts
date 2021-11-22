@@ -138,9 +138,10 @@ for each i :
   	let t=true;
   	for each j :
 		if (a[i]>a[j]){
-			return false
+			if t ==false break;
 		}
-
+	if t==true return true;
+return false;
 ***	VM.TT
 for each i :
 	let t = false;
@@ -158,62 +159,19 @@ for each i :
 			return false;
 return true
  */
-export class LoopExpr extends KeywordExpr {
-	private from: Operand;
-	private to: Operand;
-	private identifier: VariableIdentifier;
-	private type: LoopType;
-	private body: Expr;
-	private assignTo: VariableIdentifier;
-	constructor(
-		type: LoopType,
-		from: Operand,
-		to: Operand,
-		identifier: VariableIdentifier,
-		body: Expr,
-		assignto: VariableIdentifier
-	) {
+export class LoopParameter {
+	from!: LiTToken;
+	to!: Operand | undefined;
+	identifier!: VariableIdentifier;
+	type!: LoopType;
+}
+export class NestedLoopExpr extends KeywordExpr {
+	parameter: LoopParameter[] = [];
+	body!: Expr;
+	constructor() {
 		super();
-		this.type = type;
-		this.from = from;
-		this.to = to;
-		this.identifier = identifier;
-		this.body = body;
-		this.assignTo = assignto;
-	}
-	get IncrementByOne() {
-		return new AssignExpr(
-			this.identifier,
-			new BinaryExpr(
-				new Token(Operator.PLUS),
-				this.identifier.toLitoken(),
-				new LiTToken(1, LitKind.IntLit)
-			)
-		);
-	}
-	get Variable() {
-		return new AssignExpr(this.identifier, this.From);
-	}
-	// get ConditionExpr() {
-	// 	return new BinaryExpr(new Token(Operator.LESSER), this.identifier, this.To);
-	// }
-	get To() {
-		return this.to;
-	}
-	get From() {
-		return this.from;
-	}
-	get Type() {
-		return this.type;
-	}
-	get BodyExpr() {
-		return this.body;
-	}
-	get Identifier() {
-		return this.identifier;
 	}
 }
-export class NestedLoopExpr extends LoopExpr {}
 export class VariableIdentifier {
 	private name: string;
 	private type?: DataType;
@@ -221,7 +179,10 @@ export class VariableIdentifier {
 		this.name = name;
 		this.type = type;
 	}
-	static fromLitoken(tok: LiTToken) {
+	static fromLitoken(tok: LiTToken, datatype?: DataType) {
+		if (datatype) {
+			return new VariableIdentifier(tok.Value, datatype);
+		}
 		return new VariableIdentifier(tok.Value, undefined);
 	}
 	toLitoken() {
@@ -241,6 +202,32 @@ export class VariableIdentifier {
 	}
 	set Type(x: DataType | undefined) {
 		this.type = x;
+	}
+}
+export class ArrayInjectorExpr extends Expr {
+	array: VariableIdentifier;
+	position: LiTToken | VariableIdentifier;
+	constructor(
+		array: VariableIdentifier,
+		position: LiTToken | VariableIdentifier
+	) {
+		super();
+		this.position = position;
+		this.array = array;
+	}
+	get PositionValue(): string | undefined {
+		if (this.position instanceof VariableIdentifier) {
+			return this.position.Name;
+		} else if (this.position instanceof LiTToken) {
+			return this.position.Value;
+		}
+		return undefined;
+	}
+	set Position(t: LiTToken | VariableIdentifier) {
+		this.position = t;
+	}
+	set Array(t: VariableIdentifier) {
+		this.array = t;
 	}
 }
 export class FunctionDecl extends Expr {

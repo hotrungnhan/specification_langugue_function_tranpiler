@@ -1,14 +1,18 @@
 import { Operator, LitKind, LoopType, SpecialLITERAL } from "@tranpiler/token";
 import { LiTToken, ValueToken } from "@tranpiler/token";
-import { FunctionDecl, MathExpr, Operand } from "@tranpiler/expr";
+import {
+	FunctionDecl,
+	MathExpr,
+	NestedLoopExpr,
+	Operand
+} from "@tranpiler/expr";
 import {
 	BinaryExpr,
 	UnaryExpr,
 	Expr,
 	AssignExpr,
 	IfElseExpr,
-	CommandExpr,
-	LoopExpr
+	CommandExpr
 } from "@tranpiler/expr";
 import { FunctionContext, VariableContext } from "@tranpiler/context";
 import { FunctionVisitor } from "@tranpiler/visitor";
@@ -100,7 +104,7 @@ export class JavascriptFunctionVisitor
 		if (e instanceof IfElseExpr) {
 			return this.visitIfElseExpr(e);
 		}
-		if (e instanceof LoopExpr) {
+		if (e instanceof NestedLoopExpr) {
 			return this.visitLoop(e);
 		}
 		if (e instanceof CommandExpr) {
@@ -180,27 +184,14 @@ export class JavascriptFunctionVisitor
 		}
 		return ctx;
 	}
-	visitLoop(loop: LoopExpr): string {
+	visitLoop(loop: NestedLoopExpr): string {
 		let loopcontext = new VariableContext();
 		let ctx = "";
-		ctx +=
-			this.level.getSpaceByLevel() +
-			`for (${this.visitAssignExpr(loop.Variable, loopcontext)};`;
-		loopcontext.pushVariable(loop.Identifier);
-		// ctx += `${this.visitBinary(loop.ConditionExpr)};${this.visitAssignExpr(
-		// 	loop.IncrementByOne,
-		// 	loopcontext
-		// )}){\n`;
+
 		this.level.incre();
-		if (loop.Type == LoopType.TT) {
-			// ctx += this.visitExpr();
-		} else if (loop.Type == LoopType.VM) {
-		}
+		// ["VM",undefined].toString() == ["VM",undefined].toString()
 		this.level.decre();
-		// if (loop.Body) {
-		// 	ctx += this.visitExpr(loop.Body);
-		// }
-		ctx += this.level.getSpaceByLevel() + "}\n";
+
 		return ctx;
 	}
 }
