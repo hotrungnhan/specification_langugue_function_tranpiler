@@ -1,4 +1,4 @@
-import { Operator, LitKind, LoopType } from "@tranpiler/token";
+import { Operator, LitKind, LoopType, SpecialLITERAL } from "@tranpiler/token";
 import { LiTToken, ValueToken } from "@tranpiler/token";
 import { FunctionDecl, MathExpr, Operand } from "@tranpiler/expr";
 import {
@@ -77,6 +77,11 @@ export class JavascriptFunctionVisitor
 			case LitKind.FloatLit:
 			case LitKind.Unknown:
 			case LitKind.IntLit:
+				if (tok.Value == SpecialLITERAL.TRUE) {
+					return "true";
+				} else if (tok.Value == SpecialLITERAL.FALSE) {
+					return "false";
+				}
 				return tok.Value;
 			case LitKind.StringLit:
 				return `"${tok.Value}"`;

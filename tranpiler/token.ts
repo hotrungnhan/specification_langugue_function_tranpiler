@@ -27,12 +27,17 @@ export enum Delemiter {
 	RBRACE = "}", // }
 	COMMA = ",", // ,
 	COLON = ":", // :
-	DOT = "." // .
+	DOT = ".", // .
+	DOTDOT = ".." // ..
 }
 export enum Keyword {
 	// ***  keywords
 	PRE = "pre", // pre
 	POST = "post" // post
+}
+export enum SpecialLITERAL {
+	TRUE = "TRUE",
+	FALSE = "FALSE"
 }
 export enum LoopType {
 	TT = "TT", //TT

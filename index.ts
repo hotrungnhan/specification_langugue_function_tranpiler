@@ -34,4 +34,3 @@ let kq = [
 	new Token(Delemiter.RPRAREN)
 ];
 let ast = new Parser().genRPN(kq);
-console.log(ast);

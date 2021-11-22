@@ -30,9 +30,7 @@ describe("visitor test", function () {
 			new VariableIdentifier("kq", DataType.B)
 		);
 		let kq = js.visitFunction(f);
-		expect(kq).equal(`function HelloWorld(){
-    let kq;
-}`);
+		expect(kq).equal(`function HelloWorld(){\n    let kq;\n    return kq;\n}`);
 	});
 	it("declare Visit", () => {
 		let f = new FunctionDecl(
@@ -46,9 +44,9 @@ describe("visitor test", function () {
 			new VariableIdentifier("kq", DataType.B)
 		);
 		let kq = js.visitFunction(f);
-		expect(kq).to.be.equal(`function HelloWorld(p1,p2){
-    let kq;
-}`);
+		expect(kq).to.be.equal(
+			`function HelloWorld(p1,p2){\n    let kq;\n    return kq;\n}`
+		);
 	});
 	it("set variable which already declare on parameter", () => {
 		let f = new FunctionDecl(
@@ -62,9 +60,9 @@ describe("visitor test", function () {
 			new VariableIdentifier("kq", DataType.B)
 		);
 		let kq = js.visitFunction(f);
-		expect(kq).to.be.equal(`function HelloWorld(p1,p2){
-    let kq;
-}`);
+		expect(kq).to.be.equal(
+			`function HelloWorld(p1,p2){\n    let kq;\n    return kq;\n}`
+		);
 	});
 	it("whileloop", () => {
 		js.reset();
@@ -90,7 +88,9 @@ describe("visitor test", function () {
 			new VariableIdentifier("kq", DataType.B)
 		);
 		let kq = js.visitFunction(f);
-		expect(kq).to.be.equal("");
+		expect(kq).to.be.equal(
+			"function HelloWorld(p1,p2){\n    let kq;\n    return kq;\n}' to equal 'function HelloWorld(p1,p2){\n    let kq;\n}"
+		);
 	});
 });
 export {};

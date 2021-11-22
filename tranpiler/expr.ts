@@ -3,15 +3,13 @@ import {
 	LitKind,
 	LiTToken,
 	LoopType,
-	NameToken,
 	Operator,
 	Token,
-	TokenT,
-	ValueToken
+	TokenT
 } from "@tranpiler/token";
 import { FunctionVisitor } from "@tranpiler/visitor";
-import { VariableContext } from "./context";
-export type Operand = LiTToken | Expr ;
+import { VariableContext } from "@tranpiler/context";
+export type Operand = LiTToken | Expr;
 export abstract class Expr {
 	static Parser(list: Array<Token>) {}
 	OperandParser(value: Operand | undefined, visitor: FunctionVisitor): string {
@@ -129,18 +127,51 @@ export class IfElseExpr extends KeywordExpr {
 		this.wrong = e;
 	}
 }
+/**
+*** TT.TT
+for each i :
+ 	for each j :
+		if (a[i]>a[j])
+			return true
+***	TT.VM
+for each i :
+  	let t=true;
+  	for each j :
+		if (a[i]>a[j]){
+			return false
+		}
+
+***	VM.TT
+for each i :
+	let t = false;
+  	for each j :
+	if (a[i]>a[j]){
+		t=true
+		break;
+	}
+	if (t==false) return false;
+return true
+***	VM.VM
+for each i :
+	for each j :
+		if (a[i]>a[j])
+			return false;
+return true
+ */
 export class LoopExpr extends KeywordExpr {
 	private from: Operand;
 	private to: Operand;
 	private identifier: VariableIdentifier;
 	private type: LoopType;
 	private body: Expr;
+	private assignTo: VariableIdentifier;
 	constructor(
 		type: LoopType,
 		from: Operand,
 		to: Operand,
 		identifier: VariableIdentifier,
-		body: Expr
+		body: Expr,
+		assignto: VariableIdentifier
 	) {
 		super();
 		this.type = type;
@@ -148,17 +179,18 @@ export class LoopExpr extends KeywordExpr {
 		this.to = to;
 		this.identifier = identifier;
 		this.body = body;
+		this.assignTo = assignto;
 	}
-	// get IncrementByOne() {
-	// 	return new AssignExpr(
-	// 		this.identifier,
-	// 		new BinaryExpr(
-	// 			new Token(Operator.PLUS),
-	// 			this.identifier,
-	// 			new LiTToken(1, LitKind.IntLit)
-	// 		)
-	// 	);
-	// }
+	get IncrementByOne() {
+		return new AssignExpr(
+			this.identifier,
+			new BinaryExpr(
+				new Token(Operator.PLUS),
+				this.identifier.toLitoken(),
+				new LiTToken(1, LitKind.IntLit)
+			)
+		);
+	}
 	get Variable() {
 		return new AssignExpr(this.identifier, this.From);
 	}
@@ -181,6 +213,7 @@ export class LoopExpr extends KeywordExpr {
 		return this.identifier;
 	}
 }
+export class NestedLoopExpr extends LoopExpr {}
 export class VariableIdentifier {
 	private name: string;
 	private type?: DataType;
@@ -190,6 +223,9 @@ export class VariableIdentifier {
 	}
 	static fromLitoken(tok: LiTToken) {
 		return new VariableIdentifier(tok.Value, undefined);
+	}
+	toLitoken() {
+		return new LiTToken(this.name, LitKind.Unknown);
 	}
 	Equal(cpr: VariableIdentifier) {
 		return cpr.name == this.name;

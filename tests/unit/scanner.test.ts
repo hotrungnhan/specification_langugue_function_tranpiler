@@ -141,4 +141,17 @@ describe("scanner test", function () {
 		];
 		expect(token).to.be.deep.equal(kq);
 	});
+	it("loop parser", () => {
+		let src = `(VM i TH {1..n-1}. TT j TH {i+1..n}.a(i) <= a(j))`;
+		let scanner = new Scanner().scan(src);
+		console.log(scanner);
+		
+		let kq = [
+			new LiTToken("kq", LitKind.Unknown),
+			new Token(Operator.GREATER_EQUAL),
+			new LiTToken("a1", LitKind.Unknown),
+			new Token(Basic.EOF)
+		];
+		expect("").to.be.deep.equal(kq);
+	});
 });

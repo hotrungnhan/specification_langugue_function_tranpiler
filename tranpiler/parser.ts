@@ -8,7 +8,8 @@ import {
 	Keyword,
 	getAssociated,
 	Associated,
-	getPrecedence
+	getPrecedence,
+	LoopType
 } from "@tranpiler/token";
 import {
 	AssignExpr,
@@ -204,7 +205,6 @@ export class Parser {
 			if (left instanceof IfElseExpr && right instanceof Expr) {
 				left.Wrong = right;
 			}
-			console.log("1", right);
 			return left;
 		} else if (ast instanceof BinaryExpr && ast.Type == Operator.EQUALS) {
 			const t = VariableIdentifier.fromLitoken(ast.left as LiTToken);
@@ -219,12 +219,22 @@ export class Parser {
 			}
 		}
 	}
+	parseLoop(tokens: Token[]) {
+		for (let i =0;i<=tokens.length;i++){
+			
+		}
+	}
 	parsePostExpr(tokens: Token[]): Operand | undefined {
-		let exprs: Operand | undefined;
-		let ast: Operand | undefined = this.genASTTree(tokens);
-		//type 1
-		exprs = this.genIfElse(ast);
-		//type 2 no idea
-		return exprs ? exprs : ast;
+		let isType2 = tokens.findIndex((value) => {
+			value.Type == LoopType.TH;
+		});
+		if (isType2 < 0) {
+			//type 1
+			const ast: Operand | undefined = this.genASTTree(tokens);
+			const exprs = this.genIfElse(ast);
+			return exprs ? exprs : ast;
+		} else if (isType2 > 0) {
+			//type 2 no idea
+		}
 	}
 }

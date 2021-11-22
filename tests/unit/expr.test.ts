@@ -65,7 +65,7 @@ describe("expr test", function () {
 		); // ( (5||10 ) && 5
 		let ast2 = new AssignExpr(
 			new VariableIdentifier("abc", DataType.N),
-			new VariableIdentifier("cdf", DataType.N)
+			new VariableIdentifier("cdf", DataType.N).toLitoken()
 		);
 		// ( (5||10 ) && 5
 		let ast3 = new AssignExpr(
@@ -99,47 +99,12 @@ describe("expr test", function () {
 		let kq = js.visitLoop(f);
 		expect(kq).to.be.equal("");
 	});
-	it("ifelse", () => {
-		js.reset();
+	it("ifelse with chain", () => {
 		let f = new IfElseExpr(
 			new BinaryExpr(
 				new Token(Operator.AND),
-				new VariableIdentifier("p2", DataType.CHAR_STAR),
-				new VariableIdentifier("p2", DataType.CHAR_STAR)
-			),
-			new AssignExpr(
-				new VariableIdentifier("p2", DataType.CHAR_STAR),
-				new LiTToken("p5", LitKind.StringLit)
-			)
-		);
-		js.reset();
-		let kq = js.visitIfElseExpr(f);
-		expect(kq).to.be.equal('if (p2 && p2){\n    let p2 = "p5";\n}\n');
-		f = new IfElseExpr(
-			new BinaryExpr(
-				new Token(Operator.AND),
-				new VariableIdentifier("p2", DataType.CHAR_STAR),
-				new VariableIdentifier("p2", DataType.CHAR_STAR)
-			),
-			new AssignExpr(
-				new VariableIdentifier("p2", DataType.CHAR_STAR),
-				new LiTToken("p5", LitKind.StringLit)
-			),
-			new AssignExpr(
-				new VariableIdentifier("p2", DataType.CHAR_STAR),
-				new LiTToken("p5", LitKind.StringLit)
-			)
-		);
-		js.reset();
-		kq = js.visitIfElseExpr(f);
-		expect(kq).to.be.equal(
-			'if (p2 && p2){\n    let p2 = "p5";\n} else {\n    let p2 = "p5";\n}\n'
-		);
-		f = new IfElseExpr(
-			new BinaryExpr(
-				new Token(Operator.AND),
-				new VariableIdentifier("p2", DataType.CHAR_STAR),
-				new VariableIdentifier("p2", DataType.CHAR_STAR)
+				new VariableIdentifier("p2", DataType.CHAR_STAR).toLitoken(),
+				new VariableIdentifier("p2", DataType.CHAR_STAR).toLitoken()
 			),
 			new AssignExpr(
 				new VariableIdentifier("p2", DataType.CHAR_STAR),
@@ -148,8 +113,8 @@ describe("expr test", function () {
 			new IfElseExpr(
 				new BinaryExpr(
 					new Token(Operator.AND),
-					new VariableIdentifier("p2", DataType.CHAR_STAR),
-					new VariableIdentifier("p2", DataType.CHAR_STAR)
+					new VariableIdentifier("p2", DataType.CHAR_STAR).toLitoken(),
+					new VariableIdentifier("p2", DataType.CHAR_STAR).toLitoken()
 				),
 				new AssignExpr(
 					new VariableIdentifier("p2", DataType.CHAR_STAR),
@@ -158,8 +123,8 @@ describe("expr test", function () {
 				new IfElseExpr(
 					new BinaryExpr(
 						new Token(Operator.AND),
-						new VariableIdentifier("p2", DataType.CHAR_STAR),
-						new VariableIdentifier("p2", DataType.CHAR_STAR)
+						new VariableIdentifier("p2", DataType.CHAR_STAR).toLitoken(),
+						new VariableIdentifier("p2", DataType.CHAR_STAR).toLitoken()
 					),
 					new AssignExpr(
 						new VariableIdentifier("p2", DataType.CHAR_STAR),
@@ -173,11 +138,51 @@ describe("expr test", function () {
 			)
 		);
 		js.reset();
-		kq = js.visitIfElseExpr(f);
+		let kq = js.visitIfElseExpr(f);
 
 		expect(kq).to.be.equal(
-			'if (p2 && p2){\n    let p2 = "p5";\n} else if (p2 && p2){\n    let p2 = "p5";\n} else if (p2 && p2){\n    let p2 = "p5";\n} else {\n    let p2 = "p5";\n}\n}\n}\n'
+			`if (p2 && p2){\n    let p2 = "p5";\n} else if (p2 && p2){\n    p2 = "p5";\n} else if (p2 && p2){\n    p2 = "p5";\n} else {\n    p2 = "p5";\n}\n`
 		);
+	});
+	it("ifelse with wrong", () => {
+		let f = new IfElseExpr(
+			new BinaryExpr(
+				new Token(Operator.AND),
+				new VariableIdentifier("p2", DataType.CHAR_STAR).toLitoken(),
+				new VariableIdentifier("p2", DataType.CHAR_STAR).toLitoken()
+			),
+			new AssignExpr(
+				new VariableIdentifier("p2", DataType.CHAR_STAR),
+				new LiTToken("p5", LitKind.StringLit)
+			),
+			new AssignExpr(
+				new VariableIdentifier("p2", DataType.CHAR_STAR),
+				new LiTToken("p5", LitKind.StringLit)
+			)
+		);
+		js.reset();
+		let kq = js.visitIfElseExpr(f);
+		expect(kq).to.be.equal(
+			'if (p2 && p2){\n    let p2 = "p5";\n} else {\n    p2 = "p5";\n}\n'
+		);
+	});
+	it("ifelse without wrong phase", () => {
+		js.reset();
+		let f = new IfElseExpr(
+			new BinaryExpr(
+				new Token(Operator.AND),
+				new VariableIdentifier("p2", DataType.CHAR_STAR).toLitoken(),
+				new VariableIdentifier("p2", DataType.CHAR_STAR).toLitoken()
+			),
+			new AssignExpr(
+				new VariableIdentifier("p2", DataType.CHAR_STAR),
+				new LiTToken("p5", LitKind.StringLit)
+			)
+		);
+		js.reset();
+		let kq = js.visitIfElseExpr(f);
+		expect(kq).to.be.equal('if (p2 && p2){\n    let p2 = "p5";\n}\n');
+		//
 	});
 });
 export {};

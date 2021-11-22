@@ -7,7 +7,8 @@ import {
 	Keyword,
 	LoopType,
 	Operator,
-	DataType
+	DataType,
+	SpecialLITERAL
 } from "@tranpiler/token";
 import {
 	isAlphabet,
@@ -38,14 +39,22 @@ export class Scanner {
 			) {
 				//capture number
 				let number = Number.parseFloat(s.trim());
+				let hasDotDot = false;
+				if (s.endsWith("..")) {
+					hasDotDot = true;
+				}
 				if (isInt(number)) {
 					tokens.push(new LiTToken(number, LitKind.IntLit));
 					s = "";
+					if (hasDotDot) {
+						tokens.push(new Token(Delemiter.DOTDOT));
+					}
 					continue;
 				}
 				if (isFloat(number)) {
 					tokens.push(new LiTToken(number, LitKind.FloatLit));
 					s = "";
+
 					continue;
 				}
 			} else if (
@@ -60,6 +69,14 @@ export class Scanner {
 				switch (s.trimEnd()) {
 					case "TT":
 						tokens.push(new Token(LoopType.TT));
+						s = "";
+						continue;
+					case "TRUE":
+						tokens.push(new LiTToken(SpecialLITERAL.TRUE, LitKind.IntLit));
+						s = "";
+						continue;
+					case "FALSE":
+						tokens.push(new LiTToken(SpecialLITERAL.FALSE, LitKind.IntLit));
 						s = "";
 						continue;
 					case "VM":
@@ -114,7 +131,7 @@ export class Scanner {
 				tokens.push(new LiTToken(s.replaceAll('"', ""), LitKind.StringLit));
 				s = "";
 			} else if (
-				(s.length > 0 && isNum(s[0]) && isDot(c)) ||
+				(s.length > 0 && isNum(s[0])) ||
 				(s.length > 0 && isAlphabet(s[0]) && isStar(c)) ||
 				(s == "<" && peek == "=") ||
 				(s == ">" && peek == "=") ||

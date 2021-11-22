@@ -4,13 +4,14 @@ Top Down
 - ![30%](https://progress-bar.dev/30) # Visitor py
 - ![90%](https://progress-bar.dev/90) # Visitor js
 - ![90%](https://progress-bar.dev/90) # Function Declare
-- ![85%](https://progress-bar.dev/95) # Expression Parser
-- ![80%](https://progress-bar.dev/80) # Expression Tree Builder && Token Parser
+- ![90%](https://progress-bar.dev/95) # Expression Parser
+- ![90%](https://progress-bar.dev/80) # Expression Tree Builder && Token Parser
 - ![100%](https://progress-bar.dev/100) # Scanner
 - ![100%](https://progress-bar.dev/100) # Token List
 
 # for Whole project
-
+- ![100%](https://progress-bar.dev/100) # type 1 (smoother than baby skin)
+- ![0%](https://progress-bar.dev/0) # type 2 (smoother than baby skin)
 - ![100%](https://progress-bar.dev/100) # ~~website (10 bilion percent done)~~
 - ![60%](https://progress-bar.dev/60) # Unit test (necessary)
 
