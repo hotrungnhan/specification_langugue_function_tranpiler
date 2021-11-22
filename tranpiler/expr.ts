@@ -11,7 +11,7 @@ import {
 } from "@tranpiler/token";
 import { FunctionVisitor } from "@tranpiler/visitor";
 import { VariableContext } from "./context";
-export type Operand = LiTToken | Expr | VariableIdentifier;
+export type Operand = LiTToken | Expr ;
 export abstract class Expr {
 	static Parser(list: Array<Token>) {}
 	OperandParser(value: Operand | undefined, visitor: FunctionVisitor): string {
@@ -149,22 +149,22 @@ export class LoopExpr extends KeywordExpr {
 		this.identifier = identifier;
 		this.body = body;
 	}
-	get IncrementByOne() {
-		return new AssignExpr(
-			this.identifier,
-			new BinaryExpr(
-				new Token(Operator.PLUS),
-				this.identifier,
-				new LiTToken(1, LitKind.IntLit)
-			)
-		);
-	}
+	// get IncrementByOne() {
+	// 	return new AssignExpr(
+	// 		this.identifier,
+	// 		new BinaryExpr(
+	// 			new Token(Operator.PLUS),
+	// 			this.identifier,
+	// 			new LiTToken(1, LitKind.IntLit)
+	// 		)
+	// 	);
+	// }
 	get Variable() {
 		return new AssignExpr(this.identifier, this.From);
 	}
-	get ConditionExpr() {
-		return new BinaryExpr(new Token(Operator.LESSER), this.identifier, this.To);
-	}
+	// get ConditionExpr() {
+	// 	return new BinaryExpr(new Token(Operator.LESSER), this.identifier, this.To);
+	// }
 	get To() {
 		return this.to;
 	}

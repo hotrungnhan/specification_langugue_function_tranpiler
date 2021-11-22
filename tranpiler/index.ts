@@ -3,22 +3,26 @@ import { Scanner } from "@tranpiler/scanner";
 import type { FunctionVisitor } from "@tranpiler/visitor";
 import { JavascriptFunctionVisitor } from "@tranpiler/visitor/jsvisitor";
 import { PythonFunctionVisitor } from "@tranpiler/visitor/pyvisitor";
-
+interface Options {
+	parser?: Boolean;
+	scanner?: Boolean;
+}
 export class SpecTranpiler {
 	private visitor: FunctionVisitor;
-	private src: string;
 	private parse: Parser;
 	private scanner: Scanner;
+	private log: Options;
 	constructor(
+		log?: Options,
 		visitor?: FunctionVisitor,
 		src?: string,
 		parse?: Parser,
 		scanner?: Scanner
 	) {
+		this.log = log || { parser: false, scanner: false };
 		this.parse = parse ? parse : new Parser();
 		this.scanner = scanner ? scanner : new Scanner();
 		this.visitor = visitor ? visitor : new JavascriptFunctionVisitor();
-		this.src = src ? src : "";
 	}
 	setVisitor(visitor: "js" | "py" | "python" | "javascript") {
 		switch (visitor) {
@@ -32,10 +36,16 @@ export class SpecTranpiler {
 	}
 	convert(src: string) {
 		const tokens = this.scanner.scan(src);
-		const parser = this.parse.parse(tokens);
+		const parsers = this.parse.parse(tokens);
 		this.parse.reset();
-		if (parser) {
-			const kq = this.visitor.visitFunction(parser);
+		if (this.log.scanner) {
+			console.dir("tokens", tokens);
+		}
+		if (this.log.parser) {
+			console.dir("parser", parsers);
+		}
+		if (parsers) {
+			const kq = this.visitor.visitFunction(parsers);
 			this.visitor.reset();
 			return kq;
 		} else return "";

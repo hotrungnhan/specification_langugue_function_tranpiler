@@ -26,9 +26,9 @@ describe("Tranpiler test", function () {
 	it("template 1 ", () => {
 		let src = `GiaiPhuongTrinhBac1(a:R,b:R)x:R
         pre a != 0
-        post (x = 5 && x=10)|| (x = 5 && x = 20)
+        post (x = 5 && x=10 ) || (x = 5 && x = 20)
         `;
-		const tp = new SpecTranpiler();
+		const tp = new SpecTranpiler({ parser: true });
 		console.log(tp.convert(src));
 		expect("").to.be.equal([]);
 	});

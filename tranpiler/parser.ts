@@ -195,48 +195,35 @@ export class Parser {
 
 		return outputStack;
 	}
+	private genIfElse(
+		ast: Operand | undefined
+	): AssignExpr | IfElseExpr | undefined {
+		if (ast instanceof BinaryExpr && ast.Type == Operator.OR) {
+			const left = this.genIfElse(ast.left);
+			const right = this.genIfElse(ast.right);
+			if (left instanceof IfElseExpr && right instanceof Expr) {
+				left.Wrong = right;
+			}
+			return left;
+		} else if (ast instanceof BinaryExpr && ast.Type == Operator.EQUALS) {
+			const t = VariableIdentifier.fromLitoken(ast.left as LiTToken);
+			const assign = new AssignExpr(t, ast.right);
+			return assign;
+		} else if (ast instanceof BinaryExpr && ast.Type == Operator.AND) {
+			if (ast.left instanceof BinaryExpr && ast.left.Type == Operator.EQUALS) {
+				const t = VariableIdentifier.fromLitoken(ast.left.left as LiTToken);
+				const assign = new AssignExpr(t, ast.left.right);
+				const newif = new IfElseExpr(ast.right as MathExpr, assign);
+				return newif;
+			}
+		}
+	}
 	parsePostExpr(tokens: Token[]): Operand | undefined {
 		let exprs: Operand | undefined;
 		let ast: Operand | undefined = this.genASTTree(tokens);
-		let cur: Expr | undefined;
 
 		//type 1
-		while (ast instanceof BinaryExpr && ast.Type == Operator.OR) {
-			if (ast.left instanceof BinaryExpr) {
-				if (ast.left.Type == Operator.EQUALS) {
-					let t = VariableIdentifier.fromLitoken(ast.left.left as LiTToken);
-					let assign = new AssignExpr(t, ast.left.right);
-					let newif = new IfElseExpr(ast.right as MathExpr, assign);
-					if (cur instanceof IfElseExpr) {
-						cur.Wrong = assign;
-						cur = cur.Wrong;
-					} else {
-						exprs = cur = newif;
-					}
-					ast = ast.right;
-				} else if (
-					ast.left.Type == Operator.AND &&
-					ast.left.left instanceof BinaryExpr
-				) {
-					let t = VariableIdentifier.fromLitoken(
-						ast.left.left.left as LiTToken
-					);
-					let assign = new AssignExpr(t, ast.left.left.right);
-					let newif = new IfElseExpr(ast.left.right as MathExpr, assign);
-					if (cur instanceof IfElseExpr) {
-						cur.Wrong = newif;
-						cur = cur.Wrong;
-					} else {
-						exprs = cur = newif;
-					}
-					ast = ast.right;
-				} else {
-					break;
-				}
-			} else {
-				break;
-			}
-		}
+		exprs = this.genIfElse(ast);
 		//type 2 no idea
 		return exprs ? exprs : ast;
 	}

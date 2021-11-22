@@ -182,10 +182,10 @@ export class JavascriptFunctionVisitor
 			this.level.getSpaceByLevel() +
 			`for (${this.visitAssignExpr(loop.Variable, loopcontext)};`;
 		loopcontext.pushVariable(loop.Identifier);
-		ctx += `${this.visitBinary(loop.ConditionExpr)};${this.visitAssignExpr(
-			loop.IncrementByOne,
-			loopcontext
-		)}){\n`;
+		// ctx += `${this.visitBinary(loop.ConditionExpr)};${this.visitAssignExpr(
+		// 	loop.IncrementByOne,
+		// 	loopcontext
+		// )}){\n`;
 		this.level.incre();
 		if (loop.Type == LoopType.TT) {
 			// ctx += this.visitExpr();
