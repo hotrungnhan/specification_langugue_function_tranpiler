@@ -1,4 +1,4 @@
-import { FunctionDecl } from "@tranpiler/expr";
+import { ArrayInjectorExpr, FunctionDecl } from "@tranpiler/expr";
 import { BinaryExpr, Expr, AssignExpr, IfElseExpr } from "@tranpiler/expr";
 import { LiTToken } from "@tranpiler/token";
 export interface FunctionVisitor {
@@ -10,5 +10,7 @@ export interface FunctionVisitor {
 	visitLiterature(tok: LiTToken): string;
 	visitIfElseExpr(ifElse: IfElseExpr): string;
 	reset(): void;
+	generateDemoFunctionCall(f: FunctionDecl): string;
+	visitArrayInjectorExpr(e: ArrayInjectorExpr): string;
 	// visitForLoop(AST: ForloopExpr): string;
 }

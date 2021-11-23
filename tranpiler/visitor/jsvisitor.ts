@@ -1,10 +1,18 @@
-import { Operator, LitKind, LoopType, SpecialLITERAL } from "@tranpiler/token";
+import {
+	Operator,
+	LitKind,
+	LoopType,
+	SpecialLITERAL,
+	DataType,
+	Token
+} from "@tranpiler/token";
 import { LiTToken, ValueToken } from "@tranpiler/token";
 import {
+	ArrayInjectorExpr,
 	FunctionDecl,
 	MathExpr,
 	NestedLoopExpr,
-	Operand
+	Operand,
 } from "@tranpiler/expr";
 import {
 	BinaryExpr,
@@ -20,10 +28,36 @@ export class JavascriptFunctionVisitor
 	extends FunctionContext
 	implements FunctionVisitor
 {
+	f: FunctionDecl | undefined;
+	generateDemoFunctionCall(f: FunctionDecl) {
+		const Param = f.Parameter.map((param) => {
+			switch (param.Type) {
+				case DataType.B:
+					return "True";
+				case DataType.CHAR_STAR:
+					return '"demo string"';
+				case DataType.N:
+					return "2";
+				case DataType.R:
+					return "4.54";
+				case DataType.R_STAR:
+					return "[2.43,4.534]";
+				case DataType.Z:
+					return "-2492";
+				case DataType.Z_STAR:
+					return "[-4,1,100]";
+			}
+			return "unknowntype";
+		});
+		let paramcall = Param.join(",");
+
+		return `console.log(${f.functionName}(${paramcall}));`;
+	}
 	genCommand(str: string) {
 		return `${this.level.getSpaceByLevel()}${str};\n`;
 	}
 	visitFunction(f: FunctionDecl): string {
+		this.f = f;
 		let output = `function ${f.functionName}`;
 		output += "(";
 		//setup parameter
@@ -40,11 +74,21 @@ export class JavascriptFunctionVisitor
 		// declare output variable
 		this.level.incre();
 		if (f.Return) {
-			output += this.genCommand(this.visitAssignExpr(new AssignExpr(f.Return)));
+			if (f.Return.Type == DataType.R_STAR || f.Return.Type == DataType.Z_STAR)
+				output += this.genCommand(
+					this.visitAssignExpr(
+						new AssignExpr(f.Return, new LiTToken("[]", LitKind.Unknown))
+					)
+				);
+			else {
+				output += this.genCommand(
+					this.visitAssignExpr(new AssignExpr(f.Return))
+				);
+			}
 		}
 		if (f.Pre) {
 			output += this.visitExpr(
-				new IfElseExpr(f.Pre as MathExpr, new CommandExpr("Return"))
+				new IfElseExpr(f.Pre as MathExpr, new CommandExpr("return"))
 			);
 		}
 		if (f.Post) {
@@ -58,6 +102,10 @@ export class JavascriptFunctionVisitor
 		output += "}";
 		this.reset();
 		return output;
+	}
+	reset() {
+		super.reset();
+		this.f = undefined;
 	}
 	visitAssignExpr(expr: AssignExpr, context?: VariableContext): string {
 		let ctx: VariableContext = context ? context : this;
@@ -113,7 +161,13 @@ export class JavascriptFunctionVisitor
 		if (e instanceof LiTToken) {
 			return this.visitLiterature(e);
 		}
+		if (e instanceof ArrayInjectorExpr) {
+			return this.visitArrayInjectorExpr(e);
+		}
 		return "";
+	}
+	visitArrayInjectorExpr(e: ArrayInjectorExpr): string {
+		return `${e.ArrayName}[${e.PositionValue}]`;
 	}
 	visitCommandExpr(cm: CommandExpr) {
 		return cm.Command;
@@ -129,14 +183,15 @@ export class JavascriptFunctionVisitor
 		switch (expr.Type) {
 			// case Operator.ASSIGN:
 			// return `(${expr.visitLeft(this)} = ${expr.visitRight(this)})`;
+
 			case Operator.PLUS:
-				return `(${expr.valueRight(this)} + ${expr.valueRight(this)})`;
+				return `(${expr.valueLeft(this)} + ${expr.valueRight(this)})`;
 			case Operator.MINUS:
-				return `(${expr.valueRight(this)} - ${expr.valueRight(this)})`;
+				return `(${expr.valueLeft(this)} - ${expr.valueRight(this)})`;
 			case Operator.STAR:
-				return `(${expr.valueRight(this)} * ${expr.valueRight(this)})`;
+				return `(${expr.valueLeft(this)} * ${expr.valueRight(this)})`;
 			case Operator.SLASH:
-				return `(${expr.valueRight(this)} / ${expr.valueRight(this)})`;
+				return `(${expr.valueLeft(this)} / ${expr.valueRight(this)})`;
 			case Operator.PERCENT:
 				return `(${expr.valueLeft(this)} % ${expr.valueRight(this)})`;
 			case Operator.GREATER:
@@ -169,8 +224,6 @@ export class JavascriptFunctionVisitor
 			this.level.decre();
 			ctx += this.level.getSpaceByLevel() + `} else `;
 			ctx += this.visitIfElseExpr(ifElse.Wrong, true);
-			// this.level.decre();
-			// ctx += this.level.getSpaceByLevel() + "}\n";
 		} else if (ifElse.Wrong) {
 			this.level.decre();
 			ctx += this.level.getSpaceByLevel() + `} else {\n`;
@@ -185,13 +238,60 @@ export class JavascriptFunctionVisitor
 		return ctx;
 	}
 	visitLoop(loop: NestedLoopExpr): string {
-		let loopcontext = new VariableContext();
+		let varcontext = new VariableContext();
 		let ctx = "";
-
-		this.level.incre();
-		// ["VM",undefined].toString() == ["VM",undefined].toString()
-		this.level.decre();
-
+		//supper hard code;
+		// single loop
+		if (loop.parameter.length == 1) {
+			if (loop.parameter[0].type == LoopType.TT) {
+				ctx +=
+					this.level.getSpaceByLevel() +
+					this.visitCommandExpr(
+						new CommandExpr(`${this.f?.Return?.Name}=false`)
+					) +
+					"\n";
+				ctx +=
+					this.level.getSpaceByLevel() +
+					`for (let ${loop.parameter[0].identifier.Name}=${
+						loop.parameter[0].from.Value
+					};${loop.parameter[0].identifier.Name}<= ${this.visitExpr(
+						loop.parameter[0].to as Operand
+					)};${loop.parameter[0].identifier.Name}++){\n`;
+				this.level.incre();
+				ctx += this.visitIfElseExpr(
+					new IfElseExpr(
+						loop.body as MathExpr,
+						new CommandExpr(`${this.f?.Return?.Name}=true`)
+					)
+				);
+			} else if (loop.parameter[0].type == LoopType.VM) {
+				ctx +=
+					this.level.getSpaceByLevel() +
+					this.visitCommandExpr(
+						new CommandExpr(`${this.f?.Return?.Name}=true`)
+					) +
+					"\n";
+				ctx +=
+					this.level.getSpaceByLevel() +
+					`for (let ${loop.parameter[0].identifier.Name}=${
+						loop.parameter[0].from.Value
+					};${loop.parameter[0].identifier.Name}<= ${this.visitExpr(
+						loop.parameter[0].to as Operand
+					)};${loop.parameter[0].identifier.Name}++){\n`;
+				this.level.incre();
+				ctx += this.visitIfElseExpr(
+					new IfElseExpr(
+						loop.body as MathExpr,
+						new CommandExpr(`${this.f?.Return?.Name}=false`)
+					)
+				);
+			}
+		}
+		//CLOSE
+		loop.parameter.forEach((value) => {
+			this.level.decre();
+			ctx += this.level.getSpaceByLevel() + "}\n";
+		});
 		return ctx;
 	}
 }

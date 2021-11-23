@@ -121,35 +121,85 @@ describe("parser test", function () {
 	// 	expect(ast).to.be.equal(false);
 	// });
 	// it("scanner 1->  parser", () => {
-	// 	let src = ` ( (kq = a1) && (a1 >=a2))
-	// 		 ||((kq=a2)&&(a2>a1))
+	// 	let src = ` (
+	// 		(kq = FALSE) && (nam%4 !=0)
+	// 	 )
+	// 	 ||
+	// 	 (
+	// 		(kq = FALSE) && (nam%400 != 0)
+	// 		&& (nam%100=0)
+	// 	 ) ||
+	// 	 (
+	// 		(kq = TRUE)
+	// 		&& (nam%4 = 0)
+	// 		&& (nam%100!=0)
+	// 	 )
+	// 	 ||
+	// 	 ( (kq = TRUE) && (nam%400=0))
 	// 	`;
 
 	// 	let scanner = new Scanner().scan(src);
 
-	// 	let ast = new Parser().parsePostExpr(scanner);
+	// 	let ast = new Parser().genASTTree(scanner);
+	// 	console.dir(ast, { depth: 10, colors: true });
+	// 	expect(ast).to.be.equal(false);
+	// });
+	// it("scanner 2 ->  parser", () => {
+	// 	let src = `a(20)> 0 && a(j) && a(z)`;
+
+	// 	let scanner = new Scanner().scan(src);
+
+	// 	let ast = new Parser().genASTTree(scanner);
+	// 	console.dir(ast, { depth: 5, colors: true });
 
 	// 	expect(ast).to.be.equal(false);
 	// });
-	it("scanner 2 ->  parser", () => {
-		let src = `a(20)> 0 && a(j) && a(z)`;
+	// it("template 3 ", () => {
+	// 	let src = `
+	// 	(
+	// 	   (kq = FALSE) && (nam%4 !=0)
+	// 	)
+	// 	||
+	// 	(
+	// 	   (kq = FALSE) && (nam%400 != 0)
+	// 	   && (nam%100=0)
+	// 	) ||
+	// 	(
+	// 	   (kq = TRUE)
+	// 	   && (nam%4 = 0)
+	// 	   && (nam%100!=0)
+	// 	)
+	// 	||
+	// 	( (kq = TRUE) && (nam%400=0))
+	// 	`;
+	// 	let scanner = new Scanner().scan(src);
+	// 	let ast = new Parser().parsePostExpr(scanner);
+	// 	console.dir(ast, { depth: 10, colors: true });
 
-		let scanner = new Scanner().scan(src);
+	// 	expect(ast).to.be.equal(false);
+	// });
+	// it("template 3 ", () => {
+	// 	let src = `
+	// 	   (kq = FALSE) && (nam%4 != 0)
+	// 	   && (kq = FALSE) && (nam%400 != 0)
+	// 	   && (nam%100=0)
+	// 	   && (nam%4 = 0)
+	// 	   && (nam%100!=0)
+	// 	`;
+	// 	let scanner = new Scanner().scan(src);
+	// 	console.log();
 
-		let ast = new Parser().genASTTree(scanner);
-		console.dir(ast, { depth: 5, colors: true });
+	// 	let ast = new Parser().parsePostExpr(scanner);
+	// 	console.dir(ast, { depth: 4, colors: true });
 
-		expect(ast).to.be.equal(false);
-	});
+	// 	expect(ast).to.be.equal(false);
+	// });
 	it("scanner->loop parser", () => {
-		let src = `kq=(VM i TH {1..n-1}. TT j TH {i+1..n}.a(i) <= a(j))`;
-		let src2 = `kq=(VM i TH {1..n-1}.a(i) <= a(j))`;
+		let src = `kq = (VM i TH {1..n-1}. a(2)<= a(5))`;
 		let scanner = new Scanner().scan(src);
 		let loop = new Parser().parseLoop(scanner);
-		console.log(loop);
-		let scanner2 = new Scanner().scan(src2);
-		let loop2 = new Parser().parseLoop(scanner2);
-		console.log(loop2);
+		console.log(loop, { depth: 5 });
 		expect("").to.be.deep.equal(false);
 	});
+	
 });

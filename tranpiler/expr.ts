@@ -19,7 +19,10 @@ export abstract class Expr {
 			return visitor.visitLiterature(value);
 		} else if (value instanceof VariableIdentifier) {
 			return value.Name;
+		} else if (value instanceof ArrayInjectorExpr) {
+			return visitor.visitArrayInjectorExpr(value);
 		}
+
 		return "";
 	}
 }
@@ -150,8 +153,11 @@ for each i :
 		t=true
 		break;
 	}
-	if (t==false) return false;
-return true
+	if (t==false) {
+		kq=false;
+		break;
+	};
+kq=true
 ***	VM.VM
 for each i :
 	for each j :
@@ -205,8 +211,8 @@ export class VariableIdentifier {
 	}
 }
 export class ArrayInjectorExpr extends Expr {
-	array: VariableIdentifier;
-	position: LiTToken | VariableIdentifier;
+	private array: VariableIdentifier;
+	private position: LiTToken | VariableIdentifier;
 	constructor(
 		array: VariableIdentifier,
 		position: LiTToken | VariableIdentifier
@@ -222,6 +228,9 @@ export class ArrayInjectorExpr extends Expr {
 			return this.position.Value;
 		}
 		return undefined;
+	}
+	get ArrayName() {
+		return this.array.Name;
 	}
 	set Position(t: LiTToken | VariableIdentifier) {
 		this.position = t;

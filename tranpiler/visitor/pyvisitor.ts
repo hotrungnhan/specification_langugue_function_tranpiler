@@ -5,17 +5,43 @@ import {
 	AssignExpr,
 	IfElseExpr,
 	CommandExpr,
-	LoopExpr
+	NestedLoopExpr
 } from "@tranpiler/expr";
-import { LiTToken } from "@tranpiler/token";
+import { DataType, LiTToken } from "@tranpiler/token";
 import { FunctionVisitor } from "@tranpiler/visitor";
 import { Operator, LitKind, LoopType } from "@tranpiler/token";
 import { FunctionDecl, MathExpr, Operand } from "@tranpiler/expr";
 import { FunctionContext, VariableContext } from "@tranpiler/context";
 
-export class PythonFunctionVisitor extends FunctionContext implements FunctionVisitor {
+export class PythonFunctionVisitor
+	extends FunctionContext
+	implements FunctionVisitor
+{
 	genCommand(str: string) {
 		return `${this.level.getSpaceByLevel()}${str};\n`;
+	}
+	generateDemoFunctionCall(f: FunctionDecl) {
+		const Param = f.Parameter.map((param) => {
+			switch (param.Type) {
+				case DataType.B:
+					return "True";
+				case DataType.CHAR_STAR:
+					return '"demo string"';
+				case DataType.N:
+					return "5";
+				case DataType.R:
+					return "4.54";
+				case DataType.R_STAR:
+					return "[2.43,4.534]";
+				case DataType.Z:
+					return "-2492";
+				case DataType.Z_STAR:
+					return "[-4,1,100]";
+			}
+			return "unknowntype";
+		});
+		let paramcall = Param.join(",");
+		return `${f.functionName}(${paramcall})`;
 	}
 	visitFunction(f: FunctionDecl): string {
 		let output = `def ${f.functionName}`;
@@ -92,7 +118,7 @@ export class PythonFunctionVisitor extends FunctionContext implements FunctionVi
 		if (e instanceof IfElseExpr) {
 			return this.visitIfElseExpr(e);
 		}
-		if (e instanceof LoopExpr) {
+		if (e instanceof NestedLoopExpr) {
 			return this.visitLoop(e);
 		}
 		if (e instanceof CommandExpr) {
@@ -172,29 +198,29 @@ export class PythonFunctionVisitor extends FunctionContext implements FunctionVi
 		}
 		return ctx;
 	}
-	visitLoop(loop: LoopExpr): string {
-	// 	let loopcontext = new VariableContext();
-	// 	let ctx = "";
-	// 	ctx +=
-	// 		this.level.getSpaceByLevel() +
-	// 		`for (${this.visitAssignExpr(loop.Variable, loopcontext)};`;
-	// 	loopcontext.pushVariable(loop.Identifier);
-	// 	ctx += `${this.visitBinary(loop.ConditionExpr)};${this.visitAssignExpr(
-	// 		loop.IncrementByOne,
-	// 		loopcontext
-	// 	)}){\n`;
-	// 	this.level.incre();
-	// 	if (loop.Type == LoopType.TT) {
-	// 		// ctx += this.visitExpr();
-	// 	} else if (loop.Type == LoopType.VM) {
-	// 	}
-	// 	this.level.decre();
-	// 	// if (loop.Body) {
-	// 	// 	ctx += this.visitExpr(loop.Body);
-	// 	// }
-	// 	ctx += this.level.getSpaceByLevel() + "}\n";
-	// 	return ctx;
-	// }
-	throw new Error("Method not implemented.");
+	visitLoop(loop: NestedLoopExpr): string {
+		// 	let loopcontext = new VariableContext();
+		// 	let ctx = "";
+		// 	ctx +=
+		// 		this.level.getSpaceByLevel() +
+		// 		`for (${this.visitAssignExpr(loop.Variable, loopcontext)};`;
+		// 	loopcontext.pushVariable(loop.Identifier);
+		// 	ctx += `${this.visitBinary(loop.ConditionExpr)};${this.visitAssignExpr(
+		// 		loop.IncrementByOne,
+		// 		loopcontext
+		// 	)}){\n`;
+		// 	this.level.incre();
+		// 	if (loop.Type == LoopType.TT) {
+		// 		// ctx += this.visitExpr();
+		// 	} else if (loop.Type == LoopType.VM) {
+		// 	}
+		// 	this.level.decre();
+		// 	// if (loop.Body) {
+		// 	// 	ctx += this.visitExpr(loop.Body);
+		// 	// }
+		// 	ctx += this.level.getSpaceByLevel() + "}\n";
+		// 	return ctx;
+		// }
+		throw new Error("Method not implemented.");
 	}
 }

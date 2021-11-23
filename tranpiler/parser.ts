@@ -113,7 +113,7 @@ export class Parser {
 		while (RPN.length > 0) {
 			const token = RPN.shift() as Token;
 			if (
-				RPN.length > 3 &&
+				RPN.length >= 3 &&
 				token.Type == Basic.LITERAL &&
 				(RPN[0] as Token).Type == Delemiter.LBRACK &&
 				(RPN[1] as Token).Type == Basic.LITERAL &&
@@ -126,6 +126,7 @@ export class Parser {
 				RPN.shift();
 				continue;
 			}
+
 			switch (token.Type) {
 				case Basic.LITERAL:
 					temp.push(token as LiTToken);
@@ -146,7 +147,6 @@ export class Parser {
 					let right = temp.pop() as LiTToken | Expr;
 					let left = temp.pop() as LiTToken | Expr;
 					temp.push(new BinaryExpr(token, left, right));
-
 					break;
 				case Operator.NOT:
 					temp.push(new UnaryExpr(token, temp.pop() as LiTToken | Expr));
@@ -160,7 +160,7 @@ export class Parser {
 		const outputStack: Token[] = [];
 		token.forEach((token, index, arr) => {
 			if (
-				arr.length > index + 1 + 3 &&
+				arr.length >= index + 1 + 3 &&
 				token.Type == Basic.LITERAL &&
 				(arr[index + 1] as Token).Type == Delemiter.LPRAREN &&
 				(arr[index + 2] as Token).Type == Basic.LITERAL &&
@@ -190,6 +190,7 @@ export class Parser {
 				case Operator.AND:
 				case Operator.OR:
 					let top = operatorStack[operatorStack.length - 1]; // peek
+
 					if (
 						(top &&
 							getAssociated(token.Type) == Associated.LEFT &&
@@ -227,16 +228,21 @@ export class Parser {
 
 		return outputStack;
 	}
-	private genIfElse(
+	genIfElse(
 		ast: Operand | undefined
-	): AssignExpr | IfElseExpr | undefined {
+	): AssignExpr | IfElseExpr | Expr | undefined {
 		if (ast instanceof BinaryExpr && ast.Type == Operator.OR) {
 			const left = this.genIfElse(ast.left);
 			const right = this.genIfElse(ast.right);
-			if (left instanceof IfElseExpr && right instanceof Expr) {
-				left.Wrong = right;
+			let cur = left;
+			while (cur instanceof IfElseExpr && cur.Wrong) {
+				cur = cur.Wrong;
+			}
+			if (cur instanceof IfElseExpr && right instanceof Expr) {
+				cur.Wrong = right;
 			}
 			return left;
+			// TODO: Some bug was there #1
 		} else if (ast instanceof BinaryExpr && ast.Type == Operator.EQUALS) {
 			const t = VariableIdentifier.fromLitoken(ast.left as LiTToken);
 			const assign = new AssignExpr(t, ast.right);
@@ -245,10 +251,33 @@ export class Parser {
 			if (ast.left instanceof BinaryExpr && ast.left.Type == Operator.EQUALS) {
 				const t = VariableIdentifier.fromLitoken(ast.left.left as LiTToken);
 				const assign = new AssignExpr(t, ast.left.right);
-				const newif = new IfElseExpr(ast.right as MathExpr, assign);
-				return newif;
+				return new IfElseExpr(ast.right as MathExpr, assign);
 			}
+			if (ast.left instanceof BinaryExpr && ast.left.Type == Operator.AND) {
+				let start = ast;
+				let prev = start;
+				let cur = start;
+				while (
+					cur.left instanceof BinaryExpr &&
+					cur.left.Type != Operator.EQUALS
+				) {
+					prev = cur;
+					cur = cur.left;
+				}
+				prev.left = cur.right;
+				if (
+					cur.left instanceof BinaryExpr &&
+					cur.left.Type == Operator.EQUALS
+				) {
+					const t = VariableIdentifier.fromLitoken(cur.left.left as LiTToken);
+					const assign = new AssignExpr(t, cur.left.right);
+					return new IfElseExpr(start as MathExpr, assign);
+				}
+				return ast;
+			}
+			return ast;
 		}
+		return undefined;
 	}
 	parseLoop(tokens: Token[]) {
 		let index = 0;
@@ -310,19 +339,20 @@ export class Parser {
 		let bodyToks: Token[] = [];
 		while (true) {
 			cur = next();
-			bodyToks.push(cur);
-			if (cur.Type == Basic.EOF) {
+			if (cur == undefined || cur.Type == Basic.EOF) {
 				break;
 			}
+			bodyToks.push(cur);
 		}
 		bodyToks.pop(); // pop last )
 		expr.body = this.genASTTree(bodyToks) as MathExpr;
 		return expr;
 	}
 	parsePostExpr(tokens: Token[]): Operand | undefined {
-		let isType2 = tokens.findIndex((value) => {
-			value.Type == LoopType.TH;
+		const isType2 = tokens.findIndex((value) => {
+			return value.Type == LoopType.TH;
 		});
+
 		if (isType2 < 0) {
 			//type 1
 			const ast: Operand | undefined = this.genASTTree(tokens);
@@ -330,6 +360,8 @@ export class Parser {
 			return exprs ? exprs : ast;
 		} else if (isType2 > 0) {
 			//type 2 no idea
+			const exprs = this.parseLoop(tokens);
+			return exprs ? exprs : this.genASTTree(tokens);
 		}
 	}
 }

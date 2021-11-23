@@ -25,6 +25,7 @@ function App() {
 	const [language, setLanguage] = useState("javascript");
 	const [credit, setCredit] = useState(0);
 	const [src, setSrc] = useState("");
+	const [isFunctionCall, setIsFunctionCall] = useState(true);
 	const [specSrc, setSpecSrc] = useState("");
 	const [stdin, setStdin] = useState("");
 	const [output, setOutput] = useState("");
@@ -50,7 +51,10 @@ function App() {
 			monaco.languages.setMonarchTokensProvider("specs", specsTokenizer);
 		}
 	}, [monaco]);
-
+	useEffect(() => {
+		tranpiler.EnableGenFunctionCall = isFunctionCall;
+		[isFunctionCall];
+	});
 	useEffect(() => {
 		Api.getCredit()
 			.then((res) => {
@@ -74,7 +78,6 @@ function App() {
 	}
 	function changeLanguage(event: React.ChangeEvent<HTMLSelectElement>) {
 		setLanguage(event.target.value);
-		console.log(event.target.value.toLowerCase());
 		tranpiler.setVisitor(
 			event.target.value.toLowerCase() as "python" | "javascript" | "js" | "py"
 		);
@@ -164,17 +167,36 @@ function App() {
 					>
 						Run
 					</button>
-					<select
-						value={language}
-						className="rounded-md p-2 text-center"
-						onChange={changeLanguage}
+					<button
+						className="btn border-blue-100 border-2 bg-green-400 my-auto text-white"
+						onClick={executeCode}
 					>
-						<option value="Javascript">Javascript</option>
-						<option value="Python">Python</option>
-					</select>
-					<p className="text-white text-center text-sm font-semibold">
-						Current Credit: {credit}
-					</p>
+						Run
+					</button>
+					<div className="mx-auto">
+						<label htmlFor="functioncall" className="text-white pr-1">
+							Call ?
+						</label>
+						<input
+							type="checkbox"
+							name="functioncall"
+							value=""
+							onChange={(event) => setIsFunctionCall(event.target.checked)}
+						/>
+					</div>
+					<div>
+						<select
+							value={language}
+							className="rounded-md p-2 text-center"
+							onChange={changeLanguage}
+						>
+							<option value="Javascript">Javascript</option>
+							<option value="Python">Python</option>
+						</select>
+						<p className="text-white text-center text-sm font-semibold">
+							Current Credit: {credit}
+						</p>
+					</div>
 				</div>
 				<div className="w-19/40 h-96">
 					<h1 className="text-xl text-white mb-4 pl-2">{language}</h1>

@@ -12,6 +12,7 @@ export class SpecTranpiler {
 	private parse: Parser;
 	private scanner: Scanner;
 	private log: Options;
+	private isGenFunctionCall: boolean = true;
 	constructor(
 		log?: Options,
 		visitor?: FunctionVisitor,
@@ -23,6 +24,9 @@ export class SpecTranpiler {
 		this.parse = parse ? parse : new Parser();
 		this.scanner = scanner ? scanner : new Scanner();
 		this.visitor = visitor ? visitor : new JavascriptFunctionVisitor();
+	}
+	set EnableGenFunctionCall(t: boolean) {
+		this.isGenFunctionCall = t;
 	}
 	setVisitor(visitor: "js" | "py" | "python" | "javascript") {
 		switch (visitor) {
@@ -39,13 +43,16 @@ export class SpecTranpiler {
 		const parsers = this.parse.parse(tokens);
 		this.parse.reset();
 		if (this.log.scanner) {
-			console.dir("tokens", tokens);
+			console.dir(tokens, { depth: 5, colors: true });
 		}
 		if (this.log.parser) {
-			console.dir("parser", parsers);
+			console.dir(parsers, { depth: 5, colors: true });
 		}
 		if (parsers) {
-			const kq = this.visitor.visitFunction(parsers);
+			let kq = this.visitor.visitFunction(parsers);
+			if (this.isGenFunctionCall) {
+				kq += "\n" + this.visitor.generateDemoFunctionCall(parsers);
+			}
 			this.visitor.reset();
 			return kq;
 		} else return "";
