@@ -6,8 +6,7 @@ import {
 	UnaryExpr,
 	IfElseExpr,
 	AssignExpr,
-	Expr,
-	LoopExpr
+	Expr
 } from "@tranpiler/expr";
 import {
 	Token,
