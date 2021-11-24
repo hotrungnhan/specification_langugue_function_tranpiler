@@ -50,7 +50,6 @@ export class JavascriptFunctionVisitor
 			return "unknowntype";
 		});
 		let paramcall = Param.join(",");
-
 		return `console.log(${f.functionName}(${paramcall}));`;
 	}
 	genCommand(str: string) {

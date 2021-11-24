@@ -22,7 +22,6 @@ export abstract class Expr {
 		} else if (value instanceof ArrayInjectorExpr) {
 			return visitor.visitArrayInjectorExpr(value);
 		}
-
 		return "";
 	}
 }

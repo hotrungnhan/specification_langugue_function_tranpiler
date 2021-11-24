@@ -5,7 +5,8 @@ import {
 	AssignExpr,
 	IfElseExpr,
 	CommandExpr,
-	NestedLoopExpr
+	NestedLoopExpr,
+	ArrayInjectorExpr
 } from "@tranpiler/expr";
 import { DataType, LiTToken } from "@tranpiler/token";
 import { FunctionVisitor } from "@tranpiler/visitor";
@@ -17,6 +18,9 @@ export class PythonFunctionVisitor
 	extends FunctionContext
 	implements FunctionVisitor
 {
+	visitArrayInjectorExpr(e: ArrayInjectorExpr): string {
+		throw new Error("Method not implemented.");
+	}
 	genCommand(str: string) {
 		return `${this.level.getSpaceByLevel()}${str};\n`;
 	}
@@ -64,7 +68,7 @@ export class PythonFunctionVisitor
 		}
 		if (f.Pre) {
 			output += this.visitExpr(
-				new IfElseExpr(f.Pre as MathExpr, new CommandExpr("Return"))
+				new IfElseExpr(f.Pre as MathExpr, new CommandExpr("return"))
 			);
 		}
 		if (f.Post) {

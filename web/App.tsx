@@ -19,8 +19,13 @@ const modelType: Styles = {
 		zIndex: 1000
 	}
 };
-
+type TLanguage = "javascript" | "python";
+const languageMap = {
+	javascript: Api.Language.js,
+	python: Api.Language.py
+};
 import * as Api from "@web/api";
+const tranpiler = new SpecTranpiler();
 function App() {
 	const [language, setLanguage] = useState("javascript");
 	const [credit, setCredit] = useState(0);
@@ -31,7 +36,7 @@ function App() {
 	const [output, setOutput] = useState("");
 	const [errorMessage, setErrorMessage] = useState("");
 	const monaco = useMonaco();
-	const tranpiler = new SpecTranpiler();
+
 	const isModalOpen = useMemo(() => {
 		if (typeof errorMessage === "string") return errorMessage.trim() !== "";
 		else return false;
@@ -40,11 +45,7 @@ function App() {
 	function closeModal() {
 		setErrorMessage("");
 	}
-	type TLanguage = "javascript" | "python";
-	const languageMap = {
-		javascript: Api.Language.js,
-		python: Api.Language.py
-	};
+
 	useEffect(() => {
 		if (monaco) {
 			monaco.languages.register({ id: "specs" });
@@ -78,6 +79,7 @@ function App() {
 	}
 	function changeLanguage(event: React.ChangeEvent<HTMLSelectElement>) {
 		setLanguage(event.target.value);
+		console.log(event.target.value.toLowerCase());
 		tranpiler.setVisitor(
 			event.target.value.toLowerCase() as "python" | "javascript" | "js" | "py"
 		);
