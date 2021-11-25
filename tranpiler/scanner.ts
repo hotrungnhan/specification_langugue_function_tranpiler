@@ -181,11 +181,19 @@ export class Scanner {
 					s = "";
 					continue;
 				case "+":
-					tokens.push(new Token(Operator.PLUS));
+					if (tokens.at(-1)?.Type != Basic.LITERAL) {
+						tokens.push(new Token(Operator.UNARY_PLUS));
+					} else {
+						tokens.push(new Token(Operator.PLUS));
+					}
 					s = "";
 					continue;
 				case "-":
-					tokens.push(new Token(Operator.MINUS));
+					if (tokens.at(-1)?.Type != Basic.LITERAL) {
+						tokens.push(new Token(Operator.UNARY_MINUS));
+					} else {
+						tokens.push(new Token(Operator.MINUS));
+					}
 					s = "";
 					continue;
 				case "*":

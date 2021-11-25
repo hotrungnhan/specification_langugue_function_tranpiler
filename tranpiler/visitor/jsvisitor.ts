@@ -12,7 +12,7 @@ import {
 	FunctionDecl,
 	MathExpr,
 	NestedLoopExpr,
-	Operand,
+	Operand
 } from "@tranpiler/expr";
 import {
 	BinaryExpr,
@@ -91,7 +91,12 @@ export class JavascriptFunctionVisitor
 			);
 		}
 		if (f.Post) {
-			output += this.visitExpr(f.Post);
+			// chú ý
+			if (f.Post instanceof IfElseExpr || f.Post instanceof NestedLoopExpr) {
+				output += this.visitExpr(f.Post);
+			} else {
+				output += this.genCommand(this.visitExpr(f.Post));
+			}
 		}
 		if (f.Return) {
 			output += this.genCommand(
@@ -174,7 +179,11 @@ export class JavascriptFunctionVisitor
 	visitUnary(expr: UnaryExpr): string {
 		switch (expr.Type) {
 			case Operator.NOT:
-				return `!${expr.valueRight(this)}`;
+				return `(!${expr.valueRight(this)})`;
+			case Operator.UNARY_PLUS:
+				return `${expr.valueRight(this)}`;
+			case Operator.UNARY_MINUS:
+				return `-${expr.valueRight(this)}`;
 		}
 		return "";
 	}

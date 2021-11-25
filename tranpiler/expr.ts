@@ -58,10 +58,10 @@ export class BinaryExpr extends MathExpr {
 		this.right = right;
 	}
 	valueLeft(visitor: FunctionVisitor) {
-		return this.OperandParser(this.left, visitor);
+		return this.left ? this.OperandParser(this.left, visitor) : "";
 	}
 	valueRight(visitor: FunctionVisitor) {
-		return this.OperandParser(this.right, visitor);
+		return this.right ? this.OperandParser(this.right, visitor) : "";
 	}
 }
 

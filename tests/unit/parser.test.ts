@@ -195,11 +195,21 @@ describe("parser test", function () {
 	// 	expect(ast).to.be.equal(false);
 	// });
 	it("scanner->loop parser", () => {
-		let src = `kq = (VM i TH {1..n-1}. a(2)<= a(5))`;
+		let src = `x = -b/a`;
 		let scanner = new Scanner().scan(src);
-		let loop = new Parser().parseLoop(scanner);
+		let loop = new Parser().genRPN(scanner);
+		// let kq = new Parser().genIfElse(loop);
 		console.log(loop, { depth: 5 });
 		expect("").to.be.deep.equal(false);
 	});
-	
+	it("scanner->loop parser", () => {
+		let src = `x = -b/a`;
+		let scanner = new Scanner().scan(src);
+		
+		let loop = new Parser().genRPN(scanner);
+		let loop2 = new Parser().genASTTree(scanner);
+		console.dir(loop, { depth: 5 });
+		console.dir(loop2, { depth: 5 });
+		expect("").to.be.deep.equal(false);
+	});
 });

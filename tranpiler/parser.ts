@@ -103,7 +103,8 @@ export class Parser {
 		return new FunctionDecl(fname, parameter, post, pre, retur);
 	}
 	parsePreExpr(tokens: Token[]): MathExpr | undefined {
-		return this.genASTTree(tokens);
+		const op = this.genASTTree(tokens);
+		return op ? new UnaryExpr(new Token(Operator.NOT), op) : undefined;
 	}
 	genASTTree(tokens: Token[]): MathExpr | undefined {
 		const RPN = this.genRPN(tokens) as Operand[];
@@ -148,6 +149,8 @@ export class Parser {
 					let left = temp.pop() as LiTToken | Expr;
 					temp.push(new BinaryExpr(token, left, right));
 					break;
+				case Operator.UNARY_PLUS:
+				case Operator.UNARY_MINUS:
 				case Operator.NOT:
 					temp.push(new UnaryExpr(token, temp.pop() as LiTToken | Expr));
 					break;
@@ -155,10 +158,10 @@ export class Parser {
 		}
 		return temp.pop() as MathExpr | undefined;
 	}
-	genRPN(token: Token[]) {
+	genRPN(tokens: Token[]) {
 		const operatorStack: Token[] = [];
 		const outputStack: Token[] = [];
-		token.forEach((token, index, arr) => {
+		tokens.forEach((token, index, arr) => {
 			if (
 				arr.length >= index + 1 + 3 &&
 				token.Type == Basic.LITERAL &&
@@ -169,7 +172,6 @@ export class Parser {
 				(arr[index + 1] as Token).Type = Delemiter.LBRACK;
 				(arr[index + 3] as Token).Type = Delemiter.RBRACK;
 			}
-
 			switch (token.Type) {
 				case Basic.LITERAL:
 				case Delemiter.LBRACK:
@@ -189,8 +191,10 @@ export class Parser {
 				case Operator.LESSER_EQUAL:
 				case Operator.AND:
 				case Operator.OR:
+				case Operator.NOT:
+				case Operator.UNARY_MINUS:
+				case Operator.UNARY_PLUS:
 					let top = operatorStack[operatorStack.length - 1]; // peek
-
 					if (
 						(top &&
 							getAssociated(token.Type) == Associated.LEFT &&
@@ -205,7 +209,6 @@ export class Parser {
 					}
 					operatorStack.push(token);
 					break;
-
 				case Delemiter.LPRAREN:
 					operatorStack.push(token);
 					break;
@@ -213,6 +216,7 @@ export class Parser {
 					let t: Token | undefined;
 					while (true) {
 						t = operatorStack.pop();
+
 						if (t && (t as Token).Type != Delemiter.LPRAREN) {
 							outputStack.push(t as Token);
 						} else {

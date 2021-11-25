@@ -79,7 +79,6 @@ function App() {
 	}
 	function changeLanguage(event: React.ChangeEvent<HTMLSelectElement>) {
 		setLanguage(event.target.value);
-		console.log(event.target.value.toLowerCase());
 		tranpiler.setVisitor(
 			event.target.value.toLowerCase() as "python" | "javascript" | "js" | "py"
 		);

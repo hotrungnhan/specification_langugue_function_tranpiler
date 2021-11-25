@@ -58,6 +58,8 @@ export enum Operator {
 	// *** operator
 	PLUS = "+", // +
 	MINUS = "-", // -
+	UNARY_PLUS = "+u", // +
+	UNARY_MINUS = "-u", // -
 	STAR = "*", // *
 	SLASH = "/", // /
 	PERCENT = "%", // %
@@ -80,11 +82,15 @@ export function getPrecedence(op: Operator) {
 	// https://i.stack.imgur.com/XgKf8.png
 	// smaller is more precedence
 	switch (op) {
+		case Operator.UNARY_PLUS:
+		case Operator.UNARY_MINUS:
+			return 4;
 		case Operator.STAR:
 		case Operator.MINUS:
 		case Operator.SLASH:
 		case Operator.PERCENT:
 			return 5;
+
 		case Operator.PLUS:
 		case Operator.MINUS:
 			return 6;
@@ -97,6 +103,7 @@ export function getPrecedence(op: Operator) {
 			return 8;
 		case Operator.NOT_EQUAL:
 			return 9;
+
 		case Operator.NOT:
 		case Operator.AND:
 			return 13;
@@ -107,10 +114,13 @@ export function getPrecedence(op: Operator) {
 	}
 }
 export function getAssociated(op: Operator) {
-	if (op == Operator.NOT) {
-		return Associated.RIGHT;
-	} else {
-		return Associated.LEFT;
+	switch (op) {
+		case Operator.NOT:
+		case Operator.UNARY_MINUS:
+		case Operator.UNARY_PLUS:
+			return Associated.RIGHT;
+		default:
+			return Associated.LEFT;
 	}
 }
 

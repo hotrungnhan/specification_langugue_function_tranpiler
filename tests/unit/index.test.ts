@@ -91,5 +91,14 @@ describe("Tranpiler test", function () {
 		let kq = tp.convert(src);
 		expect(kq).to.be.equal(``);
 	});
+	it("template 4 ", () => {
+		let src = `GiaiPhuongTrinhBac1(a:R,b:R)x:R
+		pre a != 0
+		post x = -b/a
+		`;
+		const tp = new SpecTranpiler({ parser: true });
+		let kq = tp.convert(src);
+		expect(kq).to.be.equal(``);
+	});
 });
 export {};
