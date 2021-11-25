@@ -113,21 +113,6 @@ export class Parser {
 		let temp: Operand[] = new Array(0);
 		while (RPN.length > 0) {
 			const token = RPN.shift() as Token;
-			if (
-				RPN.length >= 3 &&
-				token.Type == Basic.LITERAL &&
-				(RPN[0] as Token).Type == Delemiter.LBRACK &&
-				(RPN[1] as Token).Type == Basic.LITERAL &&
-				(RPN[2] as Token).Type == Delemiter.RBRACK
-			) {
-				const aray = VariableIdentifier.fromLitoken(token as LiTToken);
-				temp.push(new ArrayInjectorExpr(aray, RPN[1] as LiTToken));
-				RPN.shift();
-				RPN.shift();
-				RPN.shift();
-				continue;
-			}
-
 			switch (token.Type) {
 				case Basic.LITERAL:
 					temp.push(token as LiTToken);
@@ -144,10 +129,15 @@ export class Parser {
 				case Operator.GREATER_EQUAL:
 				case Operator.LESSER_EQUAL:
 				case Operator.AND:
+				case Operator.ARRAY:
 				case Operator.OR:
-					let right = temp.pop() as LiTToken | Expr;
-					let left = temp.pop() as LiTToken | Expr;
-					temp.push(new BinaryExpr(token, left, right));
+					let right = temp.pop() as Operand;
+					let left = temp.pop() as Operand;
+					if (token.Type == Operator.ARRAY) {
+						temp.push(new ArrayInjectorExpr(left as LiTToken, right));
+					} else {
+						temp.push(new BinaryExpr(token, left, right));
+					}
 					break;
 				case Operator.UNARY_PLUS:
 				case Operator.UNARY_MINUS:
@@ -163,19 +153,26 @@ export class Parser {
 		const outputStack: Token[] = [];
 		tokens.forEach((token, index, arr) => {
 			if (
-				arr.length >= index + 1 + 3 &&
+				arr.length >= index + 2 &&
 				token.Type == Basic.LITERAL &&
-				(arr[index + 1] as Token).Type == Delemiter.LPRAREN &&
-				(arr[index + 2] as Token).Type == Basic.LITERAL &&
-				(arr[index + 3] as Token).Type == Delemiter.RPRAREN
+				(arr[index + 1] as Token).Type == Delemiter.LPRAREN
 			) {
 				(arr[index + 1] as Token).Type = Delemiter.LBRACK;
-				(arr[index + 3] as Token).Type = Delemiter.RBRACK;
+				let bracket: Token[] = [];
+				for (let i = index + 1; i < arr.length; i++) {
+					if (arr[i].Type == Delemiter.LPRAREN) {
+						bracket.push(arr[i]);
+					} else if (arr[i].Type == Delemiter.RPRAREN) {
+						const pop = bracket.pop();
+						if (!pop) {
+							arr[i].Type = Delemiter.RBRACK;
+						}
+					}
+				}
 			}
+
 			switch (token.Type) {
 				case Basic.LITERAL:
-				case Delemiter.LBRACK:
-				case Delemiter.RBRACK:
 					outputStack.push(token);
 					break;
 				case Operator.PLUS:
@@ -210,19 +207,31 @@ export class Parser {
 					operatorStack.push(token);
 					break;
 				case Delemiter.LPRAREN:
+				case Delemiter.LBRACK:
 					operatorStack.push(token);
 					break;
 				case Delemiter.RPRAREN:
+					let z: Token | undefined;
+					while (true) {
+						z = operatorStack.pop();
+						if (z && (z as Token).Type != Delemiter.LPRAREN) {
+							outputStack.push(z as Token);
+						} else {
+							break;
+						}
+					}
+					break;
+				case Delemiter.RBRACK:
 					let t: Token | undefined;
 					while (true) {
 						t = operatorStack.pop();
-
-						if (t && (t as Token).Type != Delemiter.LPRAREN) {
+						if (t && (t as Token).Type != Delemiter.LBRACK) {
 							outputStack.push(t as Token);
 						} else {
 							break;
 						}
 					}
+					outputStack.push(new Token(Operator.ARRAY));
 					break;
 			}
 		});

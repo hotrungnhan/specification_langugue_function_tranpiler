@@ -72,7 +72,8 @@ export enum Operator {
 	LESSER_EQUAL = "<=", // <=
 	NOT = "!", // !
 	AND = "&&", // &&
-	OR = "||" // ||
+	OR = "||", // ||
+	ARRAY = "[]" // []
 }
 export enum Associated {
 	LEFT,

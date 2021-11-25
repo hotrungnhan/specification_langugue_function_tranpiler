@@ -203,13 +203,11 @@ describe("parser test", function () {
 		expect("").to.be.deep.equal(false);
 	});
 	it("scanner->loop parser", () => {
-		let src = `x = -b/a`;
+		let src = `x = a(i+5*2)`;
 		let scanner = new Scanner().scan(src);
-		
-		let loop = new Parser().genRPN(scanner);
-		let loop2 = new Parser().genASTTree(scanner);
+		let loop = new Parser().genASTTree(scanner);
+		// let loop2 = new Parser().genASTTree(scanner);
 		console.dir(loop, { depth: 5 });
-		console.dir(loop2, { depth: 5 });
 		expect("").to.be.deep.equal(false);
 	});
 });

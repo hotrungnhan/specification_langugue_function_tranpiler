@@ -82,21 +82,21 @@ describe("Tranpiler test", function () {
 	// 	let kq = tp.convert(src);
 	// 	expect(kq).to.be.equal(``);
 	// });
-	it("template 3 ", () => {
-		let src = `Ham (a:R*, n:N)kq:B
-		pre 
-		post kq = (VM i TH {1..n-1}. a(2)<= a(5))
-		`;
-		const tp = new SpecTranpiler({ parser: true });
-		let kq = tp.convert(src);
-		expect(kq).to.be.equal(``);
-	});
+	// it("template 3 ", () => {
+	// 	let src = `Ham (a:R*, n:N)kq:B
+	// 	pre 
+	// 	post kq = (VM i TH {1..n-1}. a(2)<= a(5))
+	// 	`;
+	// 	const tp = new SpecTranpiler({ parser: true });
+	// 	let kq = tp.convert(src);
+	// 	expect(kq).to.be.equal(``);
+	// });
 	it("template 4 ", () => {
 		let src = `GiaiPhuongTrinhBac1(a:R,b:R)x:R
 		pre a != 0
-		post x = -b/a
+		post x = a(i+5*2)
 		`;
-		const tp = new SpecTranpiler({ parser: true });
+		const tp = new SpecTranpiler({ parser: false });
 		let kq = tp.convert(src);
 		expect(kq).to.be.equal(``);
 	});

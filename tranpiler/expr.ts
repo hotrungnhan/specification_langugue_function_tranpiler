@@ -9,18 +9,16 @@ import {
 } from "@tranpiler/token";
 import { FunctionVisitor } from "@tranpiler/visitor";
 import { VariableContext } from "@tranpiler/context";
-export type Operand = LiTToken | Expr;
+export type Operand = LiTToken | Expr | VariableIdentifier;
 export abstract class Expr {
-	static Parser(list: Array<Token>) {}
+	// static Parser(list: Array<Token>) {}
 	OperandParser(value: Operand | undefined, visitor: FunctionVisitor): string {
-		if (value instanceof MathExpr) {
+		if (value instanceof Expr) {
 			return visitor.visitExpr(value);
 		} else if (value instanceof LiTToken) {
 			return visitor.visitLiterature(value);
 		} else if (value instanceof VariableIdentifier) {
 			return value.Name;
-		} else if (value instanceof ArrayInjectorExpr) {
-			return visitor.visitArrayInjectorExpr(value);
 		}
 		return "";
 	}
@@ -211,22 +209,15 @@ export class VariableIdentifier {
 }
 export class ArrayInjectorExpr extends Expr {
 	private array: VariableIdentifier;
-	private position: LiTToken | VariableIdentifier;
-	constructor(
-		array: VariableIdentifier,
-		position: LiTToken | VariableIdentifier
-	) {
+	private position: Operand;
+	constructor(array: LiTToken, position: Operand) {
 		super();
+		this.array = VariableIdentifier.fromLitoken(array);
 		this.position = position;
-		this.array = array;
 	}
-	get PositionValue(): string | undefined {
-		if (this.position instanceof VariableIdentifier) {
-			return this.position.Name;
-		} else if (this.position instanceof LiTToken) {
-			return this.position.Value;
-		}
-		return undefined;
+	PositionValue(f: FunctionVisitor): string {
+		// console.log("parser",this.OperandParser(this.position, f));
+		return this.OperandParser(this.position, f);
 	}
 	get ArrayName() {
 		return this.array.Name;

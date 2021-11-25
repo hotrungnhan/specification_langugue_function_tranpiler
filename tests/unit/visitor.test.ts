@@ -3,6 +3,7 @@ import { JavascriptFunctionVisitor } from "@tranpiler/visitor/jsvisitor";
 import {
 	FunctionDecl,
 	NestedLoopExpr,
+	Operand,
 	VariableIdentifier
 } from "@tranpiler/expr";
 import {
@@ -21,6 +22,8 @@ import {
 	LitKind,
 	LoopType
 } from "@tranpiler/token";
+import { Scanner } from "@tranpiler/scanner";
+import { Parser } from "@tranpiler/parser";
 
 let js = new JavascriptFunctionVisitor();
 describe("visitor test", function () {
@@ -66,6 +69,17 @@ describe("visitor test", function () {
 		expect(kq).to.be.equal(
 			`function HelloWorld(p1,p2){\n    let kq;\n    return kq;\n}`
 		);
+	});
+	it("Array injector", () => {
+		let token = new Scanner().scan("x=a(5+a)");
+		let array = new Parser().parsePostExpr(token) as Operand;
+		let js = new JavascriptFunctionVisitor();
+		let kq = js.visitExpr(array);
+		console.log(array);
+		
+		console.log(kq);
+
+		expect(token).to.be.deep.equal(kq);
 	});
 	// it("whileloop", () => {
 	// 	js.reset();

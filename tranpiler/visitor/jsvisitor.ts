@@ -144,6 +144,7 @@ export class JavascriptFunctionVisitor
 		}
 	}
 	visitExpr(e: Operand): string {
+		console.log(e);
 		if (e instanceof UnaryExpr) {
 			return this.visitUnary(e);
 		}
@@ -168,10 +169,11 @@ export class JavascriptFunctionVisitor
 		if (e instanceof ArrayInjectorExpr) {
 			return this.visitArrayInjectorExpr(e);
 		}
+
 		return "";
 	}
 	visitArrayInjectorExpr(e: ArrayInjectorExpr): string {
-		return `${e.ArrayName}[${e.PositionValue}]`;
+		return `${e.ArrayName}[${e.PositionValue(this)}]`;
 	}
 	visitCommandExpr(cm: CommandExpr) {
 		return cm.Command;
