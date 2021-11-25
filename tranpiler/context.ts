@@ -30,9 +30,6 @@ export class FunctionContext extends VariableContext {
 }
 class Blocklevel {
 	level = 0;
-	setReturn(){
-		return 1;
-	}
 	incre() {
 		this.level += 1;
 		return this.level;
