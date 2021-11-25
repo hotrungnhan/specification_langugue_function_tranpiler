@@ -169,12 +169,6 @@ function App() {
 					>
 						Run
 					</button>
-					<button
-						className="btn border-blue-100 border-2 bg-green-400 my-auto text-white"
-						onClick={executeCode}
-					>
-						Run
-					</button>
 					<div className="mx-auto">
 						<label htmlFor="functioncall" className="text-white pr-1">
 							Call ?
