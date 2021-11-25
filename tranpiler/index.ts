@@ -51,7 +51,7 @@ export class SpecTranpiler {
 		if (this.log.parser) {
 			console.dir(parsers, { depth: 5, colors: true });
 		}
-
+		console.log(parsers)
 		if (parsers) {
 			let kq = this.visitor.visitFunction(parsers);
 			if (this.isGenFunctionCall) {

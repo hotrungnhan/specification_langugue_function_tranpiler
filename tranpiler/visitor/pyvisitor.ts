@@ -30,27 +30,38 @@ export class PythonFunctionVisitor
 	}
     f: FunctionDecl | undefined;
     generateDemoFunctionCall(f: FunctionDecl) {
-        const Param = f.Parameter.map((param) => {
-            switch (param.Type) {
-                case DataType.B:
-                    return "True";
-                case DataType.CHAR_STAR:
-                    return '"demo string"';
-                case DataType.N:
-                    return "5";
-                case DataType.R:
-                    return "4.54";
-                case DataType.R_STAR:
-                    return "[2.43,4.534]";
-                case DataType.Z:
-                    return "2020";
-                case DataType.Z_STAR:
-                    return "[-4,1,100]";
-            }
-            return "unknowntype";
+		this.f = f;
+        let output = ""
+        f.Parameter.forEach((param, index, arr) => {
+			output += this.level.getSpaceByLevel() + `${param.Name} = input('Nhap gia tri ${param.Name} : ') \n`;
         });
-        let paramcall = Param.join(",");
-        return `print(${f.functionName}(${paramcall}));`
+        output += `\nprint(${f.functionName}(`
+		f.Parameter.forEach((param, index, arr) => {
+			switch (param.Type) {
+				case DataType.B:
+					output += "bool (";
+					break;
+				case DataType.N:
+				case DataType.Z:
+					output +="int (";
+					break;
+				case DataType.R:
+					output +="float (";
+					break;
+				case DataType.R_STAR:
+				case DataType.Z_STAR:
+					output +="list (";
+					break;
+			}
+            if (index == arr.length - 1) {
+                // last parameter
+                output += param.Name + ")"; 
+            } else {
+                output += param.Name + "),";
+            }
+        });
+		output += "))";
+		return output
     }
     visitFunction(f: FunctionDecl): string {
         this.f = f;
@@ -179,13 +190,13 @@ export class PythonFunctionVisitor
             // case Operator.ASSIGN:
             // return `(${expr.visitLeft(this)} = ${expr.visitRight(this)})`;
             case Operator.PLUS:
-                return `(${expr.valueRight(this)} + ${expr.valueRight(this)})`;
+                return `(${expr.valueLeft(this)} + ${expr.valueRight(this)})`;
             case Operator.MINUS:
-                return `(${expr.valueRight(this)} - ${expr.valueRight(this)})`;
+                return `(${expr.valueLeft(this)} - ${expr.valueRight(this)})`;
             case Operator.STAR:
-                return `(${expr.valueRight(this)} * ${expr.valueRight(this)})`;
+                return `(${expr.valueLeft(this)} * ${expr.valueRight(this)})`;
             case Operator.SLASH:
-                return `(${expr.valueRight(this)} / ${expr.valueRight(this)})`;
+                return `(${expr.valueLeft(this)} / ${expr.valueRight(this)})`;
             case Operator.PERCENT:
                 return `(${expr.valueLeft(this)} % ${expr.valueRight(this)})`;
             case Operator.GREATER:
@@ -239,6 +250,7 @@ export class PythonFunctionVisitor
         // single loop
         if (loop.parameter.length == 1) {
             if (loop.parameter[0].type == LoopType.TT) {
+				console.log(loop.body)
                 ctx +=
                     this.level.getSpaceByLevel() +
                     this.visitCommandExpr(
@@ -247,18 +259,25 @@ export class PythonFunctionVisitor
                     "\n";
                 ctx +=
                     this.level.getSpaceByLevel() +
-                    `for (let ${loop.parameter[0].identifier.Name}=${
-                        loop.parameter[0].from.Value
-                    };${loop.parameter[0].identifier.Name}<= ${this.visitExpr(
-                        loop.parameter[0].to as Operand
-                    )};${loop.parameter[0].identifier.Name}++){\n`;
+                    `for ${loop.parameter[0].identifier.Name} in range (${
+						loop.parameter[0].from.Value
+					}, ${this.visitExpr(
+						loop.parameter[0].to as Operand
+				)}): \n`;
                 this.level.incre();
-                ctx += this.visitIfElseExpr(
-                    new IfElseExpr(
-                        loop.body as MathExpr,
-                        new CommandExpr(`${this.f?.Return?.Name}=True`)
-                    )
-                );
+				ctx +=
+				this.level.getSpaceByLevel() +
+				`for ${loop.parameter[1].identifier.Name} in range (${
+					loop.parameter[1].from.Value
+				}, ${this.visitExpr(
+					loop.parameter[1].to as Operand
+			)}): \n`;
+                // ctx += this.visitIfElseExpr(
+                //     new IfElseExpr(
+                //         loop.body as MathExpr,
+                //         new CommandExpr(`${this.f?.Return?.Name}=True`)
+                //     )
+                // );
             } else if (loop.parameter[0].type == LoopType.VM) {
                 ctx +=
                     this.level.getSpaceByLevel() +
@@ -268,15 +287,17 @@ export class PythonFunctionVisitor
                     "\n";
                 ctx +=
                     this.level.getSpaceByLevel() +
-					`for (let ${loop.parameter[0].identifier.Name}=${
+					`for ${loop.parameter[0].identifier.Name} in range (${
 						loop.parameter[0].from.Value
-					};${loop.parameter[0].identifier.Name}<= ${this.visitExpr(
+					}, ${this.visitExpr(
 						loop.parameter[0].to as Operand
-					)};${loop.parameter[0].identifier.Name}++){\n`;
-                this.level.incre();
+					)}): \n`;
+				console.log(loop.body)
+				this.level.incre();
                 ctx += this.visitIfElseExpr(
                     new IfElseExpr(
-                        loop.body as MathExpr,
+                        // loop.body as MathExpr,
+						loop.body as MathExpr,
                         new CommandExpr(`${this.f?.Return?.Name}=False`)
                     )
                 );
@@ -285,7 +306,7 @@ export class PythonFunctionVisitor
         //CLOSE
         loop.parameter.forEach((value) => {
             this.level.decre();
-            ctx += this.level.getSpaceByLevel() + "}\n";
+            ctx += this.level.getSpaceByLevel() + "\n";
         });
         return ctx;
     }
