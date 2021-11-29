@@ -1,4 +1,12 @@
-Top Down
+# How to run 
+- required nodejs at least 16.13.0
+```js
+// install needed package
+npm install
+// run src code
+npm run dev
+```
+#Progress
 
 - ![70%](https://progress-bar.dev/70) # Context (not requried)
 - ![30%](https://progress-bar.dev/30) # Visitor py
@@ -9,7 +17,7 @@ Top Down
 - ![100%](https://progress-bar.dev/100) # Scanner
 - ![100%](https://progress-bar.dev/100) # Token List
 
-# for Whole project
+## for Whole project
 
 - ![100%](https://progress-bar.dev/100) # type 1 (smoother than baby skin)
 - ![70%](https://progress-bar.dev/0) # type 2 (smoother than baby skin, allow only 1 loop )
