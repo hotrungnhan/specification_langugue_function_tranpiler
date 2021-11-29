@@ -35,7 +35,7 @@ export class PythonFunctionVisitor
         this.f = f;
         let output = ""
         f.Parameter.forEach((param, index, arr) => {
-            output += this.level.getSpaceByLevel() + `${param.Name} = input('Nhap gia tri ${param.Name} : ') \n`;
+            output += this.level.getSpaceByLevel() + `${param.Name} = input() \n`;
         });
         output += `\nprint(${f.functionName}(`
         f.Parameter.forEach((param, index, arr) => {
