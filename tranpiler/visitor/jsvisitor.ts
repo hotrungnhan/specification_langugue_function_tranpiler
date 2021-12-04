@@ -30,6 +30,13 @@ export class JavascriptFunctionVisitor
 {
 	f: FunctionDecl | undefined;
 	generateDemoFunctionCall(f: FunctionDecl) {
+		function isArray(type: DataType | undefined): boolean {
+			return (
+				type == DataType.CHAR_STAR ||
+				type == DataType.R_STAR ||
+				type == DataType.Z_STAR
+			);
+		}
 		// const Param = f.Parameter.map((param) => {
 		// 	switch (param.Type) {
 		// 		case DataType.B:
@@ -50,6 +57,13 @@ export class JavascriptFunctionVisitor
 		// 	return "unknowntype";
 		// });
 		// let paramcall = Param.join(",");
+		let indexArrr = f.Parameter.map((value, index) => {
+			if (isArray(value.Type)) {
+				return index;
+			} else return undefined;
+		})
+			.filter((value) => value != undefined)
+			.join(",");
 		let template = `
 var readline = require('readline');
 var rl = readline.createInterface({
@@ -57,12 +71,17 @@ var rl = readline.createInterface({
 	output: process.stdout,
 });
 const arr = []
+const parramIndex = [${indexArrr}]
 rl.on('line', function (line) {
-	arr.push(line)
-	if (arr.length >= ${f.Parameter.length}) {
-		console.log(${f.functionName}(...arr))
-		rl.close()
-	}
+    if (parramIndex.find((value) => value == arr.length) != undefined) {
+        arr.push(line.split(" "))
+    } else {
+        arr.push(line)
+    }
+    if (arr.length >= ${f.Parameter.length}) {
+        console.log(${f.functionName}(...arr))
+        rl.close()
+    }
 })
 `;
 		return template;
