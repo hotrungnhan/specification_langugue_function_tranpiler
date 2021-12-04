@@ -30,27 +30,42 @@ export class JavascriptFunctionVisitor
 {
 	f: FunctionDecl | undefined;
 	generateDemoFunctionCall(f: FunctionDecl) {
-		const Param = f.Parameter.map((param) => {
-			switch (param.Type) {
-				case DataType.B:
-					return "True";
-				case DataType.CHAR_STAR:
-					return '"demo string"';
-				case DataType.N:
-					return "2";
-				case DataType.R:
-					return "4.54";
-				case DataType.R_STAR:
-					return "[2.43,4.534]";
-				case DataType.Z:
-					return "-2492";
-				case DataType.Z_STAR:
-					return "[-4,1,100]";
-			}
-			return "unknowntype";
-		});
-		let paramcall = Param.join(",");
-		return `console.log(${f.functionName}(${paramcall}));`;
+		// const Param = f.Parameter.map((param) => {
+		// 	switch (param.Type) {
+		// 		case DataType.B:
+		// 			return "True";
+		// 		case DataType.CHAR_STAR:
+		// 			return '"demo string"';
+		// 		case DataType.N:
+		// 			return "2";
+		// 		case DataType.R:
+		// 			return "4.54";
+		// 		case DataType.R_STAR:
+		// 			return "[2.43,4.534]";
+		// 		case DataType.Z:
+		// 			return "-2492";
+		// 		case DataType.Z_STAR:
+		// 			return "[-4,1,100]";
+		// 	}
+		// 	return "unknowntype";
+		// });
+		// let paramcall = Param.join(",");
+		let template = `
+var readline = require('readline');
+var rl = readline.createInterface({
+	input: process.stdin,
+	output: process.stdout,
+});
+const arr = []
+rl.on('line', function (line) {
+	arr.push(line)
+	if (arr.length >= ${f.Parameter.length}) {
+		console.log(${f.functionName}(...arr))
+		rl.close()
+	}
+})
+`;
+		return template;
 	}
 	genCommand(str: string) {
 		return `${this.level.getSpaceByLevel()}${str};\n`;

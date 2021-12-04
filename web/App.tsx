@@ -91,6 +91,7 @@ function App() {
 		if (credit >= 200) {
 			return setErrorMessage("Out of credit");
 		}
+		setOutput("running ......");
 		Api.executeCode(src, lang, stdin)
 			.then((res) => {
 				setCredit(credit + 1);
