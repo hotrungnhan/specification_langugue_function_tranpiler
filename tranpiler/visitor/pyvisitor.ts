@@ -105,7 +105,7 @@ export class PythonFunctionVisitor
 		}
 		if (f.Pre) {
 			output += this.visitExpr(
-				new IfElseExpr(f.Pre as MathExpr, new CommandExpr(""))
+				new IfElseExpr(f.Pre as MathExpr, new CommandExpr("return"))
 			);
 		}
 		if (f.Post) {
@@ -264,6 +264,7 @@ export class PythonFunctionVisitor
 		} else {
 			ctx += this.level.getSpaceByLevel() + "\n";
 		}
+		this.level.decre();
 		return ctx;
 	}
 	visitLoop(loop: NestedLoopExpr): string {
