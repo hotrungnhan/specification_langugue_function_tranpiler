@@ -374,6 +374,12 @@ export class Parser {
 		} else if (isType2 > 0) {
 			//type 2 no idea
 			const exprs = this.parseLoop(tokens);
+			if (
+				exprs instanceof NestedLoopExpr &&
+				exprs.parameter[0].type == LoopType.VM
+			) {
+				exprs.body = new UnaryExpr(new Token(Operator.NOT), exprs.body);
+			}
 			return exprs ? exprs : this.genASTTree(tokens);
 		}
 	}

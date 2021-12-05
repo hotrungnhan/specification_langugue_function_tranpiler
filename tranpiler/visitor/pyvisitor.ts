@@ -197,7 +197,7 @@ export class PythonFunctionVisitor
 	visitUnary(expr: UnaryExpr): string {
 		switch (expr.Type) {
 			case Operator.NOT:
-				return `(${expr.valueRight(this)})`;
+				return `not (${expr.valueRight(this)})`;
 			case Operator.UNARY_PLUS:
 				return `${expr.valueRight(this)}`;
 			case Operator.UNARY_MINUS:
