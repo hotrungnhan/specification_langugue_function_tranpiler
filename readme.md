@@ -9,7 +9,7 @@ npm run dev
 #Progress
 
 - ![70%](https://progress-bar.dev/70) # Context (not requried)
-- ![30%](https://progress-bar.dev/30) # Visitor py
+- ![100%](https://progress-bar.dev/100) # Visitor py
 - ![100%](https://progress-bar.dev/100) # Visitor js ( stable, except loop)
 - ![100%](https://progress-bar.dev/100) # Function Declare ( api stable)
 - ![100%](https://progress-bar.dev/100) # Expression Parser ( api stable)
@@ -20,7 +20,7 @@ npm run dev
 ## for Whole project
 
 - ![100%](https://progress-bar.dev/100) # type 1 (smoother than baby skin)
-- ![70%](https://progress-bar.dev/0) # type 2 (smoother than baby skin, allow only 1 loop )
+- ![70%](https://progress-bar.dev/70) # type 2 (smoother than baby skin, allow only 1 loop )
 - ![100%](https://progress-bar.dev/100) # ~~website (10 bilion percent done)~~
 - ![60%](https://progress-bar.dev/60) # Unit test (necessary)
 
